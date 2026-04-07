@@ -517,37 +517,59 @@
         function clearCart() { cart = []; saveCart(); updateCartUI(); showToast(`🗑️ تم تفريغ السلة بالكامل`, "error"); }
 
         function sendOrder() {
-            const name = document.getElementById('customerName').value.trim();
-            const phone = document.getElementById('customerPhone').value.trim();
-            const address = document.getElementById('customerAddress').value.trim();
-            if (!name || !phone || !address) { showToast('⚠️ الرجاء إدخال الاسم، رقم الجوال، والعنوان', "warning"); return; }
-            if (cart.length === 0) { showToast('⚠️ السلة فارغة، أضف منتجات أولاً', "warning"); return; }
-            const grouped = {};
-            cart.forEach(item => {
-                if (!grouped[item.shopId]) grouped[item.shopId] = { shopName: item.shopName, items: [], total: 0 };
-                grouped[item.shopId].items.push(item);
-                grouped[item.shopId].total += item.price * item.quantity;
-            });
-            let productsDetails = '';
-            let grandTotal = 0;
-            for (const shopId in grouped) {
-                const group = grouped[shopId];
-                productsDetails += `🏬 *${group.shopName}* (الإجمالي: ${group.total} $)\n\n`;
-                group.items.forEach(item => {
-                    const itemTotal = item.price * item.quantity;
-                    grandTotal += itemTotal;
-                    productsDetails += `   - ${item.productName}${item.color ? ` (${item.color})` : ''}${item.size ? ` (${item.size})` : ''} (${item.price}$) × ${item.quantity} = ${itemTotal} $\n`;
-                });
-                productsDetails += `━━━━━━━━━━━━━━━━━━━━\n`;
-            }
-            const orderNumber = `TABQA-${Date.now()}`;
-            const shamCashNumber = "0961234567";
-            const adminNumber = "963934175735";
-            const message = `📦 *طلب جديد - مول الطبقة* 📦\n🆔 #${orderNumber}\n\n👤 *العميل:* ${name}\n📞 *الجوال:* ${phone}\n📍 *العنوان:* ${address}\n\n💰 *الإجمالي الكلي:* ${grandTotal} $\n\n📋 *تفاصيل الطلب حسب المحل:*\n━━━━━━━━━━━━━━━━━━━━\n${productsDetails}\n*لتأكيد طلب التسوق*\n\n💳 *طريقة الدفع:* شام كاش\n📱 *رقم محفظة شام كاش:* ${shamCashNumber}\n📝 *تعليمات الدفع:* يرجى تحويل المبلغ إلى رقم شام كاش أعلاه، ثم إرسال صورة الإيصال عبر واتساب لتأكيد الطلب.`;
-            window.open(`https://wa.me/${adminNumber}?text=${encodeURIComponent(message)}`, '_blank');
-            showToast(`📨 تم توجيهك إلى واتساب لإرسال الطلب`, "info");
-        }
+    const name = document.getElementById('customerName').value.trim();
+    const phone = document.getElementById('customerPhone').value.trim();
+    const address = document.getElementById('customerAddress').value.trim();
+    if (!name || !phone || !address) { showToast('⚠️ الرجاء إدخال الاسم، رقم الجوال، والعنوان', "warning"); return; }
+    if (cart.length === 0) { showToast('⚠️ السلة فارغة، أضف منتجات أولاً', "warning"); return; }
+    
+    const grouped = {};
+    cart.forEach(item => {
+        if (!grouped[item.shopId]) grouped[item.shopId] = { shopName: item.shopName, items: [], total: 0 };
+        grouped[item.shopId].items.push(item);
+        grouped[item.shopId].total += item.price * item.quantity;
+    });
+    
+    let productsDetails = '';
+    let grandTotal = 0;
+    for (const shopId in grouped) {
+        const group = grouped[shopId];
+        productsDetails += `🏬 *${group.shopName}* (الإجمالي: ${group.total} $)\n\n`;
+        group.items.forEach(item => {
+            const itemTotal = item.price * item.quantity;
+            grandTotal += itemTotal;
+            // تنسيق جديد: اسم المنتج في سطر، ثم السعر في سطر تحته
+            productsDetails += `   - ${item.productName}${item.color ? ` (${item.color})` : ''}${item.size ? ` (${item.size})` : ''}\n`;
+            productsDetails += `               (${item.price}$) × ${item.quantity} = ${itemTotal} $\n`;
+        });
+        productsDetails += `━━━━━━━━━━━━━━━━━━━━\n`;
+    }
+    
+    const orderNumber = `TABQA-${Date.now()}`;
+    const shamCashNumber = "0961234567";
+    const adminNumber = "963934175735";
+    
+    const message = `📦 *طلب جديد - مول الطبقة* 📦
+🆔 #${orderNumber}
 
+👤 *العميل:* ${name}
+📞 *الجوال:* ${phone}
+📍 *العنوان:* ${address}
+
+💰 *الإجمالي الكلي:* ${grandTotal} $
+
+📋 *تفاصيل الطلب*
+━━━━━━━━━━━━━━━━━━━━
+${productsDetails}
+*لتأكيد طلب التسوق*
+
+💳 *طريقة الدفع:* شام كاش
+📱 *رقم محفظة شام كاش:* ${shamCashNumber}
+📝 *تعليمات الدفع:* يرجى تحويل المبلغ إلى رقم شام كاش أعلاه، ثم إرسال صورة الإيصال عبر واتساب لتأكيد الطلب.`;
+    
+    window.open(`https://wa.me/${adminNumber}?text=${encodeURIComponent(message)}`, '_blank');
+    showToast(`📨 تم توجيهك إلى واتساب لإرسال الطلب`, "info");
+}
         document.getElementById('clearCartBtn').addEventListener('click', () => document.getElementById('confirmClearOverlay').classList.add('active'));
         document.getElementById('confirmClearYes').addEventListener('click', () => { clearCart(); document.getElementById('confirmClearOverlay').classList.remove('active'); });
         document.getElementById('confirmClearNo').addEventListener('click', () => document.getElementById('confirmClearOverlay').classList.remove('active'));
