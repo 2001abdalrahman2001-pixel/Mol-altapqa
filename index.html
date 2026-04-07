@@ -21,6 +21,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
+        /* جميع الأنماط السابقة كما هي (بدون تغيير) */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Cairo', sans-serif; background: #ffffff; direction: rtl; padding-bottom: 70px; color: #212529; }
         .bottom-nav {
@@ -83,7 +84,7 @@
             justify-content: center; gap: 6px; color: #212529;
         }
         .add-to-cart:active { background: #c9a82e; }
-        /* أنماط السلة الجديدة (المدمجة) */
+        /* أنماط السلة */
         .cart-container { max-width: 500px; margin: 0 auto; }
         .cart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
         .clear-cart-btn { background: none; border: none; color: #dc3545; font-size: 0.9rem; cursor: pointer; display: flex; align-items: center; gap: 5px; padding: 6px 12px; border-radius: 30px; }
@@ -154,7 +155,7 @@
 </head>
 <body>
 
-<!-- ========== الجولة التعريفية ========== -->
+<!-- الجولة التعريفية (نفسها) -->
 <div id="onboardingScreen" class="onboarding-screen">
     <div class="onboarding-status"><span>9:41</span><span><i class="fas fa-signal"></i> <i class="fas fa-battery-full"></i></span></div>
     <div class="onboarding-progress"><div class="onboarding-progress-fill" id="onboardingProgressFill"></div></div>
@@ -178,7 +179,7 @@
     </div>
 </div>
 
-<!-- ========== التطبيق الرئيسي ========== -->
+<!-- التطبيق الرئيسي -->
 <div id="mainApp" class="container" style="display: none;">
     <div class="bottom-nav">
         <button data-page="home" class="nav-btn active"><i class="fas fa-home"></i><span>الرئيسية</span></button>
@@ -265,7 +266,7 @@
 <div id="confirmClearOverlay" class="confirm-overlay"><div class="confirm-box"><p>هل أنت متأكد من تفريغ السلة بالكامل؟</p><button class="confirm-yes" id="confirmClearYes">نعم، تفريغ</button><button class="confirm-no" id="confirmClearNo">إلغاء</button></div></div>
 
 <script>
-    // ========== الجولة التعريفية ==========
+    // الجولة التعريفية (نفسها)
     const onboardingScreen = document.getElementById('onboardingScreen');
     const mainApp = document.getElementById('mainApp');
     const onboardingSlides = document.querySelectorAll('#onboardingScreen .onboarding-slide');
@@ -330,9 +331,8 @@
         else if (touchEnd > touchStart + 50 && currentOnboard > 0) { currentOnboard--; updateOnboarding(); }
     });
 
-    // ========== التطبيق الرئيسي ==========
+    // التطبيق الرئيسي
     function initApp() {
-        // البيانات (الأقسام، المحلات، المنتجات، العروض، الفعاليات) كما هي سابقاً
         const sections = [
             { id: "clothes", name: "الألبسة", icon: "fa-tshirt", shopCount: "12 محل" },
             { id: "beauty", name: "المكياج والعطور", icon: "fa-mask", shopCount: "8 محلات" },
@@ -341,6 +341,7 @@
             { id: "salons", name: "الصالونات", icon: "fa-cut", shopCount: "5 محلات" },
             { id: "pharmacy", name: "الصيدلية", icon: "fa-tablets", shopCount: "2 محل" }
         ];
+
         const shopsData = {
             clothes: [
                 { id: "frat", name: "أزياء الفرات", floor: "الأول - مقابل السلم الكهربائي", images: ["https://placehold.co/600x300/f0e0b0/d4af37?text=أزياء+الفرات", "https://placehold.co/600x300/f0e0b0/d4af37?text=داخل+المحل"], phone: "0961234567" },
@@ -364,6 +365,7 @@
                 { id: "tabqaPharma", name: "صيدلية الطبقة", floor: "الثاني - بالقرب من المصعد", images: ["https://placehold.co/600x300/f0e0b0/d4af37?text=صيدلية+الطبقة"], phone: "0961012345" }
             ]
         };
+
         const productsData = {
             frat: [{ name: "قميص قطني", price: 20, icon: "fa-tshirt" }, { name: "فستان سهرة", price: 45, icon: "fa-female" }],
             sharq: [{ name: "جاكيت شتوي", price: 50, icon: "fa-tshirt" }],
@@ -375,6 +377,7 @@
             hassan: [{ name: "قص رجالي", price: 5, icon: "fa-cut" }],
             tabqaPharma: [{ name: "مسكن ألم", price: 2, icon: "fa-tablets" }]
         };
+
         const offers = [
             { title: "🔥 خصم 25% على الألبسة", code: "FRAT25" },
             { title: "🌸 عطر مجاني مع شراء 2", code: "SHAM3" },
@@ -396,11 +399,10 @@
             setTimeout(() => { toast.style.display = 'none'; }, 2500);
         }
 
-        // ========== سلة المشتريات (بالنظام الجديد) ==========
+        // سلة المشتريات
         let cart = [];
         function saveCart() { localStorage.setItem('mallCart', JSON.stringify(cart)); }
         function loadCart() { const saved = localStorage.getItem('mallCart'); if (saved) cart = JSON.parse(saved); updateCartUI(); }
-
         function addToCart(shopId, shopName, productName, price, icon = "fa-tag") {
             const existing = cart.find(item => item.shopId === shopId && item.productName === productName);
             if (existing) existing.quantity++;
@@ -477,39 +479,58 @@
         }
 
         function clearCart() { cart = []; saveCart(); updateCartUI(); showToast(`🗑️ تم تفريغ السلة بالكامل`, "error"); }
+
+        // إرسال الطلب - الرسالة المطلوبة (دمج النموذجين)
         function sendOrder() {
             const name = document.getElementById('customerName').value.trim();
             const phone = document.getElementById('customerPhone').value.trim();
             const address = document.getElementById('customerAddress').value.trim();
             if (!name || !phone || !address) { showToast('⚠️ الرجاء إدخال الاسم، رقم الجوال، والعنوان', "warning"); return; }
             if (cart.length === 0) { showToast('⚠️ السلة فارغة، أضف منتجات أولاً', "warning"); return; }
-            // تجميع المنتجات للرسالة
-            let productLines = '';
-            let grandTotal = 0;
+
+            // تجميع المنتجات حسب المحل مع حساب الإجمالي الفرعي
+            const grouped = {};
             cart.forEach(item => {
-                const total = item.price * item.quantity;
-                grandTotal += total;
-                productLines += `- ${item.productName} (${item.price} $/قطعة) × ${item.quantity} = ${total} $\n`;
+                if (!grouped[item.shopId]) grouped[item.shopId] = { shopName: item.shopName, items: [], total: 0 };
+                grouped[item.shopId].items.push(item);
+                grouped[item.shopId].total += item.price * item.quantity;
             });
-            const shamCashNumber = "0961234567";
+
+            let productsDetails = '';
+            let grandTotal = 0;
+            for (const shopId in grouped) {
+                const group = grouped[shopId];
+                productsDetails += `🏬 *${group.shopName}* (الإجمالي: ${group.total} $)\n\n`;
+                group.items.forEach(item => {
+                    const itemTotal = item.price * item.quantity;
+                    grandTotal += itemTotal;
+                    productsDetails += `   - ${item.productName} (${item.price}$) × ${item.quantity} = ${itemTotal} $\n`;
+                });
+                productsDetails += `━━━━━━━━━━━━━━━━━━━━\n`;
+            }
+
             const orderNumber = `TABQA-${Date.now()}`;
-            const message = `📦 *طلب جديد من تطبيق مول الطبقة*
-🆔 رقم الطلب: #${orderNumber}
-━━━━━━━━━━━━━━━━━━━━
-👤 *بيانات العميل:*
-الاسم: ${name}
-العنوان: ${address}
-الهاتف: ${phone}
-━━━━━━━━━━━━━━━━━━━━
-🛒 *المنتجات:*
-${productLines}
-━━━━━━━━━━━━━━━━━━━━
-💰 *الإجمالي:* ${grandTotal} $
-💳 *طريقة الدفع:* شام كاش
-📱 *رقم شام كاش:* ${shamCashNumber}
-━━━━━━━━━━━━━━━━━━━━
-📌 يرجى تأكيد الطلب والتواصل مع العميل.`;
+            const shamCashNumber = "0000000000";
             const adminNumber = "963934175735"; // غيّر إلى رقم إدارة المول
+
+            const message = `📦 *طلب جديد - مول الطبقة* 📦
+🆔 #${orderNumber}
+
+👤 *العميل:* ${name}
+📞 *الجوال:* ${phone}
+📍 *العنوان:* ${address}
+
+💰 *الإجمالي الكلي:* ${grandTotal} $
+
+📋 *تفاصيل الطلب حسب المحل:*
+━━━━━━━━━━━━━━━━━━━━
+${productsDetails}
+*لتأكيد طلب التسوق*
+
+💳 *طريقة الدفع:* شام كاش
+📱 *رقم محفظة شام كاش:* ${shamCashNumber}
+📝 *تعليمات الدفع:* يرجى تحويل المبلغ إلى رقم شام كاش أعلاه، ثم إرسال صورة الإيصال عبر واتساب لتأكيد الطلب.`;
+
             window.open(`https://wa.me/${adminNumber}?text=${encodeURIComponent(message)}`, '_blank');
             showToast(`📨 تم توجيهك إلى واتساب لإرسال الطلب`, "info");
         }
@@ -521,7 +542,7 @@ ${productLines}
         document.getElementById('sendOrderBtn').addEventListener('click', sendOrder);
         document.getElementById('continueShoppingBtn').addEventListener('click', () => showPage('sections'));
 
-        // ========== باقي دوال التطبيق (الأقسام، المحلات، المنتجات، التنقل) ==========
+        // باقي دوال التطبيق (الأقسام، المحلات، المنتجات، التنقل)
         const sectionsContainer = document.getElementById('sectionsContainer');
         sections.forEach(section => {
             const div = document.createElement('div'); div.className = 'section-card';
