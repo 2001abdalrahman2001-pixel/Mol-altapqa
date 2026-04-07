@@ -223,4 +223,417 @@
                         <h3><i class="fas fa-shopping-cart"></i> سلة المشتريات</h3>
                         <button id="clearCartBtn" class="clear-cart-btn"><i class="fas fa-trash-alt"></i> تفريغ السلة</button>
                     </div>
-                    <
+                    <div class="customer-details">
+                        <h4>👤 بياناتك للطلب</h4>
+                        <div class="input-row">
+                            <div class="input-icon"><i class="fas fa-user"></i><input type="text" id="customerName" placeholder="الاسم الكامل"></div>
+                            <div class="input-icon"><i class="fas fa-phone-alt"></i><input type="tel" id="customerPhone" placeholder="رقم الجوال"></div>
+                        </div>
+                        <div class="input-icon"><i class="fas fa-map-marker-alt"></i><input type="text" id="customerAddress" placeholder="العنوان (الحي، الشارع، معلم قريب)"></div>
+                    </div>
+                    <div class="cart-items" id="cartItemsContainer"></div>
+                    <div id="cartTotal" class="cart-total" style="display: none;"><span>💰 الإجمالي النهائي:</span><span id="grandTotalValue">0 $</span></div>
+                    <div class="action-bar">
+                        <button id="continueShoppingBtn" class="btn btn-secondary"><i class="fas fa-arrow-right"></i> متابعة التسوق</button>
+                        <button id="sendOrderBtn" class="btn btn-primary"><i class="fab fa-whatsapp"></i> إرسال الطلب (شام كاش)</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- العروض + فعاليات -->
+    <div id="offers-page" class="page">
+        <div class="card"><div class="card-content"><h3 style="color:#212529;">🔥 عروض اليوم</h3><div id="offersList"></div></div></div>
+        <div class="card"><div class="card-content"><h3 style="color:#212529;">📅 فعاليات قادمة</h3><div id="eventsList"></div></div></div>
+    </div>
+
+    <!-- المزيد -->
+    <div id="more-page" class="page">
+        <div class="card"><div class="card-content">
+            <h3 style="color:#212529;">🏢 عن مول الطبقة</h3>
+            <div class="info-text">مول الطبقة هو أكبر مول تجاري في مدينة الطبقة، يضم ثلاث طوابق تضم أقسام الألبسة، المكياج والعطور، الإلكترونيات، المطاعم، الصالونات، والصيدلية. نقدم أفضل الخدمات والتجارب التسوقية لزوارنا الكرام.</div>
+            <button id="installAppBtn" class="install-btn" style="display: none;"><i class="fas fa-download"></i> 📲 تثبيت إلى الشاشة الرئيسية</button>
+            <div class="policy-text"><strong>🔄 سياسة الاستبدال:</strong> يمكن استبدال المنتجات خلال 7 أيام من تاريخ الشراء، بشرط أن تكون بحالة جديدة، مع إرفاق الفاتورة الأصلية. لا يشمل الاستبدال المنتجات الغذائية والأدوية.</div>
+            <div class="info-text"><i class="fas fa-map-marker-alt"></i> <strong>العنوان:</strong> مدينة الطبقة - بالقرب من سد الفرات<br><i class="fas fa-phone-alt"></i> <strong>هاتف إضافي:</strong> 0961234567</div>
+        </div></div>
+    </div>
+
+    <footer>مول الطبقة - سوريا</footer>
+</div>
+
+<div id="toast" class="toast-notification" style="display: none;"></div>
+<div id="confirmClearOverlay" class="confirm-overlay"><div class="confirm-box"><p>هل أنت متأكد من تفريغ السلة بالكامل؟</p><button class="confirm-yes" id="confirmClearYes">نعم، تفريغ</button><button class="confirm-no" id="confirmClearNo">إلغاء</button></div></div>
+
+<script>
+    // الجولة التعريفية (نفسها)
+    const onboardingScreen = document.getElementById('onboardingScreen');
+    const mainApp = document.getElementById('mainApp');
+    const onboardingSlides = document.querySelectorAll('#onboardingScreen .onboarding-slide');
+    const nextBtn = document.getElementById('nextOnboardingBtn');
+    const skipBtn = document.getElementById('skipOnboardingBtn');
+    const progressFill = document.getElementById('onboardingProgressFill');
+    let currentOnboard = 0;
+    const totalOnboard = onboardingSlides.length;
+
+    if (localStorage.getItem('mollTabqa_onboarding_seen') === 'true') {
+        onboardingScreen.style.display = 'none';
+        mainApp.style.display = 'block';
+        initApp();
+    }
+
+    function updateOnboarding() {
+        onboardingSlides.forEach((slide, i) => {
+            if (i === currentOnboard) {
+                slide.classList.add('active');
+                slide.style.opacity = '1';
+                slide.style.transform = 'scale(1)';
+            } else {
+                slide.classList.remove('active');
+                slide.style.opacity = '0';
+                slide.style.transform = 'scale(1.05)';
+            }
+        });
+        const progress = ((currentOnboard + 1) / totalOnboard) * 100;
+        progressFill.style.width = `${progress}%`;
+        nextBtn.textContent = currentOnboard === totalOnboard - 1 ? '✨ ابدأ التسوق ✨' : 'التالي';
+    }
+
+    function completeOnboarding() {
+        localStorage.setItem('mollTabqa_onboarding_seen', 'true');
+        onboardingScreen.style.transition = 'opacity 0.5s ease';
+        onboardingScreen.style.opacity = '0';
+        setTimeout(() => {
+            onboardingScreen.style.display = 'none';
+            mainApp.style.display = 'block';
+            initApp();
+        }, 500);
+    }
+
+    function nextOnboard() {
+        if (currentOnboard < totalOnboard - 1) {
+            currentOnboard++;
+            updateOnboarding();
+        } else {
+            completeOnboarding();
+        }
+    }
+
+    nextBtn.addEventListener('click', nextOnboard);
+    skipBtn.addEventListener('click', completeOnboarding);
+    updateOnboarding();
+
+    let touchStart = 0, touchEnd = 0;
+    document.addEventListener('touchstart', (e) => { touchStart = e.changedTouches[0].screenX; });
+    document.addEventListener('touchend', (e) => {
+        touchEnd = e.changedTouches[0].screenX;
+        if (touchEnd < touchStart - 50) nextOnboard();
+        else if (touchEnd > touchStart + 50 && currentOnboard > 0) { currentOnboard--; updateOnboarding(); }
+    });
+
+    // التطبيق الرئيسي
+    function initApp() {
+        const sections = [
+            { id: "clothes", name: "الألبسة", icon: "fa-tshirt", shopCount: "12 محل" },
+            { id: "beauty", name: "المكياج والعطور", icon: "fa-mask", shopCount: "8 محلات" },
+            { id: "electronics", name: "الإلكترونيات", icon: "fa-mobile-alt", shopCount: "6 محلات" },
+            { id: "restaurants", name: "المطاعم", icon: "fa-utensils", shopCount: "10 محلات" },
+            { id: "salons", name: "الصالونات", icon: "fa-cut", shopCount: "5 محلات" },
+            { id: "pharmacy", name: "الصيدلية", icon: "fa-tablets", shopCount: "2 محل" }
+        ];
+
+        const shopsData = {
+            clothes: [
+                { id: "frat", name: "أزياء الفرات", floor: "الأول - مقابل السلم الكهربائي", images: ["https://placehold.co/600x300/f0e0b0/d4af37?text=أزياء+الفرات", "https://placehold.co/600x300/f0e0b0/d4af37?text=داخل+المحل"], phone: "0961234567" },
+                { id: "sharq", name: "موضة الشرق", floor: "الثاني - بجانب الكافتيريا", images: ["https://placehold.co/600x300/f0e0b0/d4af37?text=موضة+الشرق"], phone: "0961345678" }
+            ],
+            beauty: [
+                { id: "sham", name: "عطور الشام", floor: "الثاني - بجانب الصيدلية", images: ["https://placehold.co/600x300/f0e0b0/d4af37?text=عطور+الشام"], phone: "0961456789" },
+                { id: "makeup", name: "مكياجي", floor: "الثاني - مقابل المصعد", images: ["https://placehold.co/600x300/f0e0b0/d4af37?text=مكياجي"], phone: "0961567890" }
+            ],
+            electronics: [
+                { id: "tabqaElectro", name: "إلكترونيات الطبقة", floor: "الأول - المدخل الرئيسي", images: ["https://placehold.co/600x300/f0e0b0/d4af37?text=إلكترونيات"], phone: "0961678901" }
+            ],
+            restaurants: [
+                { id: "babour", name: "مطعم البابور", floor: "الثالث - منطقة المطاعم", images: ["https://placehold.co/600x300/f0e0b0/d4af37?text=مطعم+البابور", "https://placehold.co/600x300/f0e0b0/d4af37?text=الأكل"], phone: "0961789012" },
+                { id: "jisr", name: "كافتيريا الجسر", floor: "الثالث - بجانب الألعاب", images: ["https://placehold.co/600x300/f0e0b0/d4af37?text=كافتيريا+الجسر"], phone: "0961890123" }
+            ],
+            salons: [
+                { id: "hassan", name: "صالون الحسن", floor: "الثاني - بجانب العطور", images: ["https://placehold.co/600x300/f0e0b0/d4af37?text=صالون+الحسن"], phone: "0961901234" }
+            ],
+            pharmacy: [
+                { id: "tabqaPharma", name: "صيدلية الطبقة", floor: "الثاني - بالقرب من المصعد", images: ["https://placehold.co/600x300/f0e0b0/d4af37?text=صيدلية+الطبقة"], phone: "0961012345" }
+            ]
+        };
+
+        const productsData = {
+            frat: [{ name: "قميص قطني", price: 20, icon: "fa-tshirt" }, { name: "فستان سهرة", price: 45, icon: "fa-female" }],
+            sharq: [{ name: "جاكيت شتوي", price: 50, icon: "fa-tshirt" }],
+            sham: [{ name: "عطر فرنسي", price: 45, icon: "fa-spa" }],
+            makeup: [{ name: "أحمر شفاه", price: 8, icon: "fa-mask" }],
+            tabqaElectro: [{ name: "هاتف ذكي", price: 200, icon: "fa-mobile-alt" }],
+            babour: [{ name: "شاورما", price: 5, icon: "fa-utensils" }],
+            jisr: [{ name: "قهوة تركية", price: 2, icon: "fa-mug-hot" }],
+            hassan: [{ name: "قص رجالي", price: 5, icon: "fa-cut" }],
+            tabqaPharma: [{ name: "مسكن ألم", price: 2, icon: "fa-tablets" }]
+        };
+
+        const offers = [
+            { title: "🔥 خصم 25% على الألبسة", code: "FRAT25" },
+            { title: "🌸 عطر مجاني مع شراء 2", code: "SHAM3" },
+            { title: "🍽️ وجبة عائلية بـ 25$", code: "BABOUR25" }
+        ];
+        const events = [
+            { title: "🎉 عيد الفطر", date: "2 مايو" },
+            { title: "🎈 يوم الطفل", date: "20 أبريل" },
+            { title: "🍽️ مهرجان الطعام", date: "10 مايو" }
+        ];
+
+        function showToast(message, type = "info") {
+            const toast = document.getElementById('toast');
+            toast.innerHTML = `<i class="fas ${type === 'error' ? 'fa-exclamation-circle' : type === 'warning' ? 'fa-exclamation-triangle' : 'fa-check-circle'}"></i> ${message}`;
+            toast.className = 'toast-notification';
+            if (type === 'error') toast.classList.add('error');
+            if (type === 'warning') toast.classList.add('warning');
+            toast.style.display = 'flex';
+            setTimeout(() => { toast.style.display = 'none'; }, 2500);
+        }
+
+        // سلة المشتريات
+        let cart = [];
+        function saveCart() { localStorage.setItem('mallCart', JSON.stringify(cart)); }
+        function loadCart() { const saved = localStorage.getItem('mallCart'); if (saved) cart = JSON.parse(saved); updateCartUI(); }
+        function addToCart(shopId, shopName, productName, price, icon = "fa-tag") {
+            const existing = cart.find(item => item.shopId === shopId && item.productName === productName);
+            if (existing) existing.quantity++;
+            else cart.push({ shopId, shopName, productName, price, quantity: 1, icon });
+            saveCart(); updateCartUI();
+            showToast(`✅ تمت إضافة ${productName} إلى السلة`);
+        }
+
+        function updateCartUI() {
+            const container = document.getElementById('cartItemsContainer');
+            const totalDiv = document.getElementById('cartTotal');
+            const grandTotalSpan = document.getElementById('grandTotalValue');
+            if (!container) return;
+            if (cart.length === 0) {
+                container.innerHTML = '<p style="text-align:center; color:#6c757d; padding:20px;">السلة فارغة</p>';
+                totalDiv.style.display = 'none';
+                return;
+            }
+            const grouped = {};
+            cart.forEach(item => {
+                if (!grouped[item.shopId]) grouped[item.shopId] = { shopName: item.shopName, items: [] };
+                grouped[item.shopId].items.push(item);
+            });
+            let html = '', grandTotal = 0;
+            for (const shopId in grouped) {
+                const group = grouped[shopId];
+                let shopTotal = 0;
+                html += `<div class="cart-shop-group">
+                            <div class="cart-shop-title">🏬 ${group.shopName} <span class="shop-subtotal" id="shopTotal_${shopId}"></span></div>`;
+                group.items.forEach((item, idx) => {
+                    const itemTotal = item.price * item.quantity;
+                    shopTotal += itemTotal;
+                    grandTotal += itemTotal;
+                    const globalIndex = cart.findIndex(i => i.shopId === item.shopId && i.productName === item.productName);
+                    html += `<div class="cart-product-row">
+                                <div class="cart-product-img"><i class="fas ${item.icon}"></i></div>
+                                <div class="cart-product-info">
+                                    <div class="cart-product-name">${item.productName}</div>
+                                    <div class="cart-product-unit-price">${item.price} $ / قطعة</div>
+                                </div>
+                                <div class="cart-product-price">${itemTotal} $</div>
+                                <div class="cart-quantity">
+                                    <button class="qty-minus" data-index="${globalIndex}">-</button>
+                                    <span>${item.quantity}</span>
+                                    <button class="qty-plus" data-index="${globalIndex}">+</button>
+                                </div>
+                                <button class="cart-remove" data-index="${globalIndex}"><i class="fas fa-trash-alt"></i></button>
+                            </div>`;
+                });
+                html += `</div>`;
+                setTimeout(() => {
+                    const span = document.getElementById(`shopTotal_${shopId}`);
+                    if (span) span.innerText = `إجمالي القسم: ${shopTotal} $`;
+                }, 0);
+            }
+            container.innerHTML = html;
+            totalDiv.style.display = 'flex';
+            grandTotalSpan.innerText = `${grandTotal} $`;
+            // ربط الأحداث
+            document.querySelectorAll('.qty-minus').forEach(btn => btn.onclick = (e) => {
+                const idx = parseInt(btn.dataset.index);
+                if (cart[idx].quantity > 1) { cart[idx].quantity--; saveCart(); updateCartUI(); showToast(`تم تحديث كمية ${cart[idx].productName}`, "info"); }
+                else showToast(`لا يمكن أن تقل الكمية عن 1`, "warning");
+            });
+            document.querySelectorAll('.qty-plus').forEach(btn => btn.onclick = (e) => {
+                const idx = parseInt(btn.dataset.index);
+                cart[idx].quantity++; saveCart(); updateCartUI(); showToast(`تم تحديث كمية ${cart[idx].productName}`, "info");
+            });
+            document.querySelectorAll('.cart-remove').forEach(btn => btn.onclick = (e) => {
+                const idx = parseInt(btn.dataset.index);
+                const name = cart[idx].productName;
+                cart.splice(idx,1); saveCart(); updateCartUI(); showToast(`🗑️ تم حذف ${name}`, "error");
+            });
+        }
+
+        function clearCart() { cart = []; saveCart(); updateCartUI(); showToast(`🗑️ تم تفريغ السلة بالكامل`, "error"); }
+
+        // إرسال الطلب - الرسالة المطلوبة (دمج النموذجين)
+        function sendOrder() {
+            const name = document.getElementById('customerName').value.trim();
+            const phone = document.getElementById('customerPhone').value.trim();
+            const address = document.getElementById('customerAddress').value.trim();
+            if (!name || !phone || !address) { showToast('⚠️ الرجاء إدخال الاسم، رقم الجوال، والعنوان', "warning"); return; }
+            if (cart.length === 0) { showToast('⚠️ السلة فارغة، أضف منتجات أولاً', "warning"); return; }
+
+            // تجميع المنتجات حسب المحل مع حساب الإجمالي الفرعي
+            const grouped = {};
+            cart.forEach(item => {
+                if (!grouped[item.shopId]) grouped[item.shopId] = { shopName: item.shopName, items: [], total: 0 };
+                grouped[item.shopId].items.push(item);
+                grouped[item.shopId].total += item.price * item.quantity;
+            });
+
+            let productsDetails = '';
+            let grandTotal = 0;
+            for (const shopId in grouped) {
+                const group = grouped[shopId];
+                productsDetails += `🏬 *${group.shopName}* (الإجمالي: ${group.total} $)\n\n`;
+                group.items.forEach(item => {
+                    const itemTotal = item.price * item.quantity;
+                    grandTotal += itemTotal;
+                    productsDetails += `   - ${item.productName} (${item.price}$) × ${item.quantity} = ${itemTotal} $\n`;
+                });
+                productsDetails += `━━━━━━━━━━━━━━━━━━━━\n`;
+            }
+
+            const orderNumber = `TABQA-${Date.now()}`;
+            const shamCashNumber = "0961234567";
+            const adminNumber = "963000000000"; // غيّر إلى رقم إدارة المول
+
+            const message = `📦 *طلب جديد - مول الطبقة* 📦
+🆔 #${orderNumber}
+
+👤 *العميل:* ${name}
+📞 *الجوال:* ${phone}
+📍 *العنوان:* ${address}
+
+💰 *الإجمالي الكلي:* ${grandTotal} $
+
+📋 *تفاصيل الطلب حسب المحل:*
+━━━━━━━━━━━━━━━━━━━━
+${productsDetails}
+*لتأكيد طلب التسوق*
+
+💳 *طريقة الدفع:* شام كاش
+📱 *رقم محفظة شام كاش:* ${shamCashNumber}
+📝 *تعليمات الدفع:* يرجى تحويل المبلغ إلى رقم شام كاش أعلاه، ثم إرسال صورة الإيصال عبر واتساب لتأكيد الطلب.`;
+
+            window.open(`https://wa.me/${adminNumber}?text=${encodeURIComponent(message)}`, '_blank');
+            showToast(`📨 تم توجيهك إلى واتساب لإرسال الطلب`, "info");
+        }
+
+        // ربط أحداث السلة
+        document.getElementById('clearCartBtn').addEventListener('click', () => document.getElementById('confirmClearOverlay').classList.add('active'));
+        document.getElementById('confirmClearYes').addEventListener('click', () => { clearCart(); document.getElementById('confirmClearOverlay').classList.remove('active'); });
+        document.getElementById('confirmClearNo').addEventListener('click', () => document.getElementById('confirmClearOverlay').classList.remove('active'));
+        document.getElementById('sendOrderBtn').addEventListener('click', sendOrder);
+        document.getElementById('continueShoppingBtn').addEventListener('click', () => showPage('sections'));
+
+        // باقي دوال التطبيق (الأقسام، المحلات، المنتجات، التنقل)
+        const sectionsContainer = document.getElementById('sectionsContainer');
+        sections.forEach(section => {
+            const div = document.createElement('div'); div.className = 'section-card';
+            div.innerHTML = `<i class="fas ${section.icon}"></i><h3>${section.name}</h3><p>${section.shopCount}</p>`;
+            div.addEventListener('click', () => showShops(section.id, section.name));
+            sectionsContainer.appendChild(div);
+        });
+
+        let currentSectionId = null;
+        const pages = {
+            home: document.getElementById('home-page'), sections: document.getElementById('sections-page'),
+            shops: document.getElementById('shops-page'), products: document.getElementById('products-page'),
+            cart: document.getElementById('cart-page'), offers: document.getElementById('offers-page'),
+            more: document.getElementById('more-page')
+        };
+        function showPage(pageId) {
+            Object.values(pages).forEach(p => p.classList.remove('active-page'));
+            pages[pageId].classList.add('active-page');
+            document.querySelectorAll('.nav-btn').forEach(btn => { btn.classList.remove('active'); if (btn.dataset.page === pageId) btn.classList.add('active'); });
+            if (pageId === 'cart') updateCartUI();
+        }
+        function showShops(sectionId, sectionName) {
+            currentSectionId = sectionId;
+            document.getElementById('shopsTitle').innerText = `محلات ${sectionName}`;
+            const shops = shopsData[sectionId] || [];
+            const container = document.getElementById('shopsListContainer');
+            container.innerHTML = '';
+            shops.forEach(shop => {
+                const shopDiv = document.createElement('div'); shopDiv.className = 'shop-card';
+                const sliderId = `shopSlider_${shop.id}`;
+                let imagesHtml = '';
+                shop.images.forEach(img => { imagesHtml += `<div class="shop-slider-slide"><img src="${img}" alt="${shop.name}"></div>`; });
+                shopDiv.innerHTML = `
+                    <div class="shop-header"><h3>${shop.name}</h3></div>
+                    <div class="shop-slider-container" id="${sliderId}"><div class="shop-slider-track" id="${sliderId}_track">${imagesHtml}</div></div>
+                    <div class="shop-location"><i class="fas fa-location-dot"></i> الطابق ${shop.floor}</div>
+                    <button class="shop-products-btn" data-shop-id="${shop.id}" data-shop-name="${shop.name}"><i class="fas fa-store"></i> اطلع على منتجاتنا</button>
+                `;
+                const btn = shopDiv.querySelector('.shop-products-btn');
+                btn.addEventListener('click', (e) => { e.stopPropagation(); showProducts(shop.id, shop.name); });
+                container.appendChild(shopDiv);
+                const track = document.getElementById(`${sliderId}_track`);
+                if(track && track.children.length){
+                    let slideIdx = 0;
+                    setInterval(() => { slideIdx = (slideIdx + 1) % track.children.length; track.style.transform = `translateX(-${slideIdx * 100}%)`; }, 4000);
+                }
+            });
+            showPage('shops');
+        }
+        function showProducts(shopId, shopName) {
+            document.getElementById('productsTitle').innerText = `منتجات ${shopName}`;
+            const products = productsData[shopId] || [];
+            const container = document.getElementById('productsListContainer');
+            container.innerHTML = '';
+            products.forEach(prod => {
+                const div = document.createElement('div'); div.className = 'product-card';
+                div.innerHTML = `<div class="product-img"><i class="fas ${prod.icon}"></i></div><div class="product-info"><h4>${prod.name}</h4><div class="price">${prod.price} $ <span style="font-size:12px;">/ قطعة</span></div><button class="add-to-cart" data-shop-id="${shopId}" data-shop-name="${shopName}" data-product-name="${prod.name}" data-price="${prod.price}" data-icon="${prod.icon}"><i class="fas fa-cart-plus"></i> أضف للسلة</button></div>`;
+                container.appendChild(div);
+            });
+            document.querySelectorAll('.add-to-cart').forEach(btn => btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                addToCart(btn.dataset.shopId, btn.dataset.shopName, btn.dataset.productName, parseFloat(btn.dataset.price), btn.dataset.icon);
+            }));
+            showPage('products');
+        }
+        document.getElementById('backToSectionsBtn').addEventListener('click', () => showPage('sections'));
+        document.getElementById('backToShopsBtn').addEventListener('click', () => { if (currentSectionId) { const sec = sections.find(s => s.id === currentSectionId); showShops(currentSectionId, sec.name); } });
+        document.querySelectorAll('.nav-btn').forEach(btn => btn.addEventListener('click', () => showPage(btn.dataset.page)));
+        const mainTrack = document.getElementById('mainSliderTrack');
+        if(mainTrack){ const slides = mainTrack.children; let idx = 0; setInterval(() => { idx = (idx + 1) % slides.length; mainTrack.style.transform = `translateX(-${idx * 100}%)`; }, 4000); }
+        const offersDiv = document.getElementById('offersList');
+        offers.forEach(o => { const div = document.createElement('div'); div.className = 'offer-item'; div.innerHTML = `<span>${o.title}</span><button class="copy-btn" data-code="${o.code}">نسخ ${o.code}</button>`; offersDiv.appendChild(div); });
+        document.querySelectorAll('.copy-btn').forEach(btn => btn.onclick = () => { navigator.clipboard.writeText(btn.dataset.code); btn.textContent = '✓'; setTimeout(() => btn.textContent = `نسخ ${btn.dataset.code}`, 1500); showToast(`📋 تم نسخ الكود`); });
+        const eventsDiv = document.getElementById('eventsList');
+        events.forEach(e => { const div = document.createElement('div'); div.className = 'event-item'; div.innerHTML = `<span><strong>${e.title}</strong><br>📅 ${e.date}</span>`; eventsDiv.appendChild(div); });
+        loadCart();
+
+        // PWA Installation
+        let deferredPrompt;
+        const installBtn = document.getElementById('installAppBtn');
+        window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; installBtn.style.display = 'flex'; });
+        installBtn.addEventListener('click', () => {
+            if (deferredPrompt) { deferredPrompt.prompt(); deferredPrompt.userChoice.then(() => { deferredPrompt = null; installBtn.style.display = 'none'; }); }
+            else { showToast('📲 يمكنك تثبيت التطبيق من قائمة المتصفح (إضافة إلى الشاشة الرئيسية)'); }
+        });
+    }
+    if ('serviceWorker' in navigator) {
+        const swCode = `self.addEventListener('install', e => e.waitUntil(caches.open('mall-v1').then(c => c.addAll(['/','/index.html'])))); self.addEventListener('fetch', e => e.respondWith(caches.match(e.request).then(r => r || fetch(e.request))));`;
+        const blob = new Blob([swCode], {type: 'application/javascript'});
+        navigator.serviceWorker.register(URL.createObjectURL(blob));
+    }
+</script>
+</body>
+</html>
