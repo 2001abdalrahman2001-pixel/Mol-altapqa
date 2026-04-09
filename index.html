@@ -21,7 +21,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        /* جميع الأنماط السابقة (كما هي) */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Cairo', sans-serif; background: #ffffff; direction: rtl; padding-bottom: 70px; color: #212529; }
         .bottom-nav {
@@ -41,10 +40,22 @@
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         .card { background: white; border-radius: 24px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); border: 1px solid #f0e0b0; overflow: hidden; }
         .card-content { padding: 20px; }
-        .slider-container { width: 100%; overflow: hidden; }
-        .slider-track { display: flex; transition: transform 0.5s ease-in-out; }
-        .slider-slide { flex: 0 0 100%; }
-        .slider-slide img { width: 100%; height: 200px; object-fit: cover; display: block; border-radius: 16px; }
+        /* السلايدر الجديد (بسيط) */
+        .slider-container {
+            position: relative;
+            width: 100%;
+            border-radius: 16px;
+            overflow: hidden;
+            background: #000;
+        }
+        .slider-container img {
+            width: 100%;
+            display: block;
+            aspect-ratio: 16 / 9;
+            object-fit: cover;
+            transition: opacity 0.3s ease;
+        }
+        /* باقي الأنماط (كما هي مع تعديلات بسيطة) */
         .shop-slider-container { width: 100%; overflow: hidden; border-radius: 16px; margin-bottom: 12px; }
         .shop-slider-track { display: flex; transition: transform 0.5s ease-in-out; }
         .shop-slider-slide { flex: 0 0 100%; }
@@ -58,20 +69,94 @@
         .section-card h3 { font-size: 1rem; font-weight: 600; color: #212529; }
         .section-card p { font-size: 12px; color: #6c757d; margin-top: 4px; }
         .section-card:active { transform: scale(0.97); background: #fffaf0; }
+        /* شاشة المحلات مع الفلتر */
+        .shops-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            gap: 8px;
+        }
+        .back-btn-shops {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #d4af37;
+            width: 40px;
+            text-align: center;
+        }
+        .shops-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #212529;
+            text-align: center;
+            flex: 1;
+            white-space: nowrap;
+        }
+        .filter-select-wrapper {
+            position: relative;
+            width: 110px;
+        }
+        .filter-select {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 100%;
+            background: white;
+            border: 1px solid #d4af37;
+            border-radius: 40px;
+            padding: 6px 24px 6px 10px;
+            font-family: 'Cairo', sans-serif;
+            font-weight: 600;
+            font-size: 0.8rem;
+            color: #212529;
+            cursor: pointer;
+            outline: none;
+        }
+        .filter-select-wrapper::after {
+            content: "\f0d7";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #d4af37;
+            pointer-events: none;
+            font-size: 12px;
+        }
         .shops-list { display: flex; flex-direction: column; gap: 20px; }
-        .shop-card { background: white; border-radius: 20px; overflow: hidden; border: 1px solid #f0e0b0; transition: 0.2s; }
+        .shop-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            border: 1px solid #f0e0b0;
+            transition: 0.2s;
+        }
         .shop-card:active { background: #fffaf5; transform: translateY(-2px); }
         .shop-header { padding: 14px 16px; border-bottom: 1px solid #f0e0b0; text-align: center; }
         .shop-header h3 { font-size: 1.2rem; font-weight: 700; color: #212529; }
-        .shop-location { text-align: center; margin: 12px 16px; font-size: 0.85rem; color: #495057; }
+        .shop-image { padding: 16px; display: flex; justify-content: center; }
+        .shop-image img { width: 100%; max-width: 240px; height: 140px; object-fit: cover; border-radius: 16px; border: 1px solid #e0e0e0; }
+        .shop-location { text-align: center; margin: 0 16px 12px; font-size: 0.85rem; color: #495057; }
         .shop-location i { color: #d4af37; margin-left: 5px; }
         .shop-products-btn {
-            background: #d4af37; margin: 12px 16px 20px; padding: 10px; border-radius: 40px;
-            text-align: center; color: #212529; font-weight: 600; display: flex; align-items: center;
-            justify-content: center; gap: 8px; cursor: pointer; border: none; width: calc(100% - 32px);
+            background: #d4af37;
+            margin: 12px 16px 20px;
+            padding: 10px;
+            border-radius: 40px;
+            text-align: center;
+            color: #212529;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+            border: none;
+            width: calc(100% - 32px);
         }
         .shop-products-btn:active { background: #c9a82e; transform: scale(0.98); }
-        /* بطاقات المنتجات (بدون سعر وبدون زر إضافة) */
         .products-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 16px; }
         .product-card {
             background: white; border-radius: 20px; overflow: hidden; border: 1px solid #f0e0b0;
@@ -82,7 +167,7 @@
         .product-card:active { transform: scale(0.97); background: #fffaf5; }
         .product-card i { font-size: 48px; color: #d4af37; margin-bottom: 8px; display: block; }
         .product-card h4 { font-size: 1rem; font-weight: 600; margin: 0; }
-        /* أنماط السلة */
+        /* أنماط السلة والمزيد (كما هي) */
         .cart-container { max-width: 500px; margin: 0 auto; }
         .cart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
         .clear-cart-btn { background: none; border: none; color: #dc3545; font-size: 0.9rem; cursor: pointer; display: flex; align-items: center; gap: 5px; padding: 6px 12px; border-radius: 30px; }
@@ -126,7 +211,7 @@
         .top-bar { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; background: white; padding: 8px 12px; border-radius: 40px; border: 1px solid #f0e0b0; }
         .back-btn { background: none; border: none; font-size: 22px; cursor: pointer; color: #d4af37; }
         footer { text-align: center; font-size: 11px; color: #adb5bd; padding: 16px; }
-        /* أنماط الجولة التعريفية */
+        /* أنماط الجولة التعريفية (كما هي) */
         .onboarding-screen { position: fixed; top:0; left:0; width:100%; height:100%; background:#0a0a0a; z-index:1000; }
         .onboarding-slide { position: absolute; top:0; left:0; width:100%; height:100%; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; background-size: cover; background-position: center; opacity: 0; transform: scale(1.05); transition: opacity 0.6s ease, transform 0.6s ease; }
         .onboarding-slide.active { opacity: 1; transform: scale(1); z-index: 2; }
@@ -142,7 +227,7 @@
         .onboarding-buttons { position: absolute; bottom:30px; left:0; right:0; display:flex; justify-content:center; gap:16px; padding:0 20px; z-index:10; }
         .btn-onboard-secondary { background:rgba(255,255,255,0.15); backdrop-filter:blur(10px); color:white; border:1px solid rgba(255,255,255,0.3); padding:12px 28px; border-radius:50px; font-weight:600; cursor:pointer; }
         .btn-onboard-primary { background:linear-gradient(135deg,#d4af37,#c9a82e); color:#000; box-shadow:0 4px 15px rgba(212,175,55,0.3); padding:12px 28px; border-radius:50px; font-weight:600; cursor:pointer; }
-        /* نافذة تفاصيل المنتج (مودال) */
+        /* مودال المنتج (كما هو) */
         .modal {
             display: none;
             position: fixed;
@@ -195,30 +280,6 @@
         .modal-qty { display: flex; align-items: center; gap: 16px; margin: 16px 0; justify-content: center; }
         .modal-qty button { width: 36px; height: 36px; border-radius: 50%; background: #f8f0e0; border: none; font-size: 1.2rem; cursor: pointer; }
         .modal-add { background: #d4af37; border: none; width: 100%; padding: 12px; border-radius: 60px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; margin-top: 8px; }
-        /* تنسيقات جديدة للصفحة الرئيسية */
-        .home-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding: 0 8px;
-        }
-        .home-header h1 {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: #212529;
-            margin: 0;
-            text-align: center;
-            flex: 1;
-        }
-        .home-header .shopping-emoji {
-            font-size: 1.8rem;
-            margin-left: 8px;
-        }
-        /* تعديل بسيط لجعل السلايدر منفصلاً */
-        .slider-card {
-            margin-bottom: 16px;
-        }
     </style>
 </head>
 <body>
@@ -277,57 +338,51 @@
         <button data-page="more" class="nav-btn"><i class="fas fa-ellipsis-h"></i><span>المزيد</span></button>
     </div>
 
-    <!-- الصفحة الرئيسية - تصميم جديد -->
+    <!-- الصفحة الرئيسية (مع السلايدر الجديد) -->
     <div id="home-page" class="page active-page">
-        <!-- الشريط العلوي: اسم المركز في المنتصف، إموجي التسوق على أقصى اليسار -->
-        <div class="home-header">
-            <div class="shopping-emoji">🛍️</div>
-            <h1>سنتر مول الطبقة</h1>
-            <div style="width: 2rem;"></div> <!-- لتحقيق التوازن -->
-        </div>
-
-        <!-- معرض الصور (السلايدر) - بطاقة منفصلة -->
-        <div class="card slider-card">
-            <div class="slider-container" id="mainSlider">
-                <div class="slider-track" id="mainSliderTrack">
-                    <div class="slider-slide"><img src="https://placehold.co/600x400/f0e0b0/d4af37?text=واجهة+المول"></div>
-                    <div class="slider-slide"><img src="https://placehold.co/600x400/f0e0b0/d4af37?text=داخل+المول"></div>
-                    <div class="slider-slide"><img src="https://placehold.co/600x400/f0e0b0/d4af37?text=مطعم+البابور"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ساعات العمل -->
         <div class="card">
+            <div class="slider-container">
+                <img id="mainSliderImage" src="https://raw.githubusercontent.com/2001abdalrahman2001-pixel/Mol-altapqa/main/photo_2026-04-09_13-53-35.jpg" alt="معرض مول الطبقة">
+            </div>
             <div class="card-content">
-                <h3>📍 أوقات العمل</h3>
-                <p>يومياً: 10ص - 11م<br>الجمعة: 2م - 11م</p>
+                <h2 style="color:#212529; font-size:1.6rem;">🛍️ سنتر مول الطبقة</h2>
+                <div style="color:#495057; margin-bottom:20px;">ثلاث طوابق | أشهر الماركات</div>
             </div>
         </div>
-
-        <!-- موقع المول (الخريطة) -->
-        <div class="card">
-            <div class="card-content">
-                <h3>🗺️ موقعنا</h3>
-                <iframe width="100%" height="200" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" 
-        src="https://www.openstreetmap.org/export/embed.html?bbox=38.54035556316376%2C35.83516740061013%2C38.544185757637024%2C35.837315757030105&amp;layer=mapnik&amp;marker=35.836242%2C38.542271" 
-        style="border: 1px solid #f0e0b0; border-radius: 16px;">
-</iframe>
-            </div>
-        </div>
+        <div class="card"><div class="card-content"><h3>📍 أوقات العمل</h3><p>يومياً: 10ص - 11م<br>الجمعة: 2م - 11م</p></div></div>
+        <div class="card"><div class="card-content"><h3>🗺️ موقعنا</h3><iframe style="width:100%; height:160px; border-radius:16px; border:0;" src="https://www.openstreetmap.org/export/embed.html?bbox=38.54035556316376%2C35.83516740061013%2C38.544185757637024%2C35.837315757030105&amp;layer=mapnik&amp;marker=35.836242%2C38.542271"></iframe></div></div>
     </div>
 
-    <!-- باقي الصفحات (الأقسام، المحلات، المنتجات، السلة، العروض، المزيد) كما هي دون تغيير -->
+    <!-- الأقسام -->
     <div id="sections-page" class="page"><div class="card"><div class="card-content"><h3>اختر القسم</h3><div class="sections-grid" id="sectionsContainer"></div></div></div></div>
 
-    <div id="shops-page" class="page"><div class="top-bar"><button class="back-btn" id="backToSectionsBtn"><i class="fas fa-arrow-right"></i></button><h3 id="shopsTitle">محلات القسم</h3></div><div class="shops-list" id="shopsListContainer"></div></div>
+    <!-- المحلات (مع الفلتر) -->
+    <div id="shops-page" class="page">
+        <div class="shops-header">
+            <button class="back-btn-shops" id="backToSectionsBtn"><i class="fas fa-arrow-right"></i></button>
+            <span class="shops-title" id="shopsTitle">محلات القسم</span>
+            <div class="filter-select-wrapper" id="filterWrapper" style="display: none;">
+                <select id="filterSelect" class="filter-select">
+                    <option value="all">الكل</option>
+                    <option value="men">رجالي</option>
+                    <option value="women">نسائي</option>
+                    <option value="kids">ولادي</option>
+                </select>
+            </div>
+        </div>
+        <div class="shops-list" id="shopsListContainer"></div>
+    </div>
 
+    <!-- المنتجات -->
     <div id="products-page" class="page"><div class="top-bar"><button class="back-btn" id="backToShopsBtn"><i class="fas fa-arrow-right"></i></button><h3 id="productsTitle">منتجات المحل</h3></div><div class="products-grid" id="productsListContainer"></div></div>
 
+    <!-- السلة -->
     <div id="cart-page" class="page"><div class="cart-container"><div class="card"><div class="card-content"><div class="cart-header"><h3><i class="fas fa-shopping-cart"></i> سلة المشتريات</h3><button id="clearCartBtn" class="clear-cart-btn"><i class="fas fa-trash-alt"></i> تفريغ السلة</button></div><div class="customer-details"><h4>👤 بياناتك للطلب</h4><div class="input-row"><div class="input-icon"><i class="fas fa-user"></i><input type="text" id="customerName" placeholder="الاسم الكامل"></div><div class="input-icon"><i class="fas fa-phone-alt"></i><input type="tel" id="customerPhone" placeholder="رقم الجوال"></div></div><div class="input-icon"><i class="fas fa-map-marker-alt"></i><input type="text" id="customerAddress" placeholder="العنوان"></div></div><div class="cart-items" id="cartItemsContainer"></div><div id="cartTotal" class="cart-total" style="display:none;"><span>💰 الإجمالي النهائي:</span><span id="grandTotalValue">0 $</span></div><div class="action-bar"><button id="continueShoppingBtn" class="btn btn-secondary"><i class="fas fa-arrow-right"></i> متابعة التسوق</button><button id="sendOrderBtn" class="btn btn-primary"><i class="fab fa-whatsapp"></i> إرسال الطلب (شام كاش)</button></div></div></div></div></div>
 
+    <!-- العروض + فعاليات -->
     <div id="offers-page" class="page"><div class="card"><div class="card-content"><h3>🔥 عروض اليوم</h3><div id="offersList"></div></div></div><div class="card"><div class="card-content"><h3>📅 فعاليات قادمة</h3><div id="eventsList"></div></div></div></div>
 
+    <!-- المزيد -->
     <div id="more-page" class="page"><div class="card"><div class="card-content"><h3>🏢 عن مول الطبقة</h3><div class="info-text">مول الطبقة هو أكبر مول تجاري في مدينة الطبقة، يضم ثلاث طوابق تضم أقسام الألبسة، المكياج والعطور، الإلكترونيات، المطاعم، الصالونات، والصيدلية.</div><button id="installAppBtn" class="install-btn" style="display: none;"><i class="fas fa-download"></i> 📲 تثبيت إلى الشاشة الرئيسية</button><div class="policy-text"><strong>🔄 سياسة الاستبدال:</strong> يمكن استبدال المنتجات خلال 7 أيام من تاريخ الشراء، بشرط أن تكون بحالة جديدة، مع إرفاق الفاتورة الأصلية. لا يشمل الاستبدال المنتجات الغذائية والأدوية.</div><div class="info-text"><i class="fas fa-map-marker-alt"></i> <strong>العنوان:</strong> مدينة الطبقة - بالقرب من سد الفرات<br><i class="fas fa-phone-alt"></i> <strong>هاتف إضافي:</strong> 0961234567</div></div></div></div>
     <footer>مول الطبقة - سوريا</footer>
 </div>
@@ -336,7 +391,7 @@
 <div id="confirmClearOverlay" class="confirm-overlay"><div class="confirm-box"><p>هل أنت متأكد من تفريغ السلة بالكامل؟</p><button class="confirm-yes" id="confirmClearYes">نعم، تفريغ</button><button class="confirm-no" id="confirmClearNo">إلغاء</button></div></div>
 
 <script>
-    // الجولة التعريفية (نفسها)
+    // ========== الجولة التعريفية (نفسها) ==========
     const onboardingScreen = document.getElementById('onboardingScreen');
     const mainApp = document.getElementById('mainApp');
     const onboardingSlides = document.querySelectorAll('#onboardingScreen .onboarding-slide');
@@ -382,8 +437,27 @@
         else if (touchEnd > touchStart + 50 && currentOnboard > 0) { currentOnboard--; updateOnboarding(); }
     });
 
-    // التطبيق الرئيسي
+    // ========== التطبيق الرئيسي ==========
     function initApp() {
+        // السلايدر الرئيسي (بسيط)
+        const sliderImages = [
+            "https://raw.githubusercontent.com/2001abdalrahman2001-pixel/Mol-altapqa/main/photo_2026-04-09_13-53-35.jpg",
+            "https://raw.githubusercontent.com/2001abdalrahman2001-pixel/Mol-altapqa/main/photo_2026-04-09_13-52-59.jpg",
+            "https://raw.githubusercontent.com/2001abdalrahman2001-pixel/Mol-altapqa/main/photo_2026-04-09_13-52-42.jpg"
+        ];
+        let currentImageIndex = 0;
+        const mainSliderImg = document.getElementById('mainSliderImage');
+        function nextSliderImage() {
+            currentImageIndex = (currentImageIndex + 1) % sliderImages.length;
+            mainSliderImg.style.opacity = '0';
+            setTimeout(() => {
+                mainSliderImg.src = sliderImages[currentImageIndex];
+                mainSliderImg.style.opacity = '1';
+            }, 300);
+        }
+        setInterval(nextSliderImage, 4000);
+
+        // بيانات الأقسام والمحلات والمنتجات (مع إضافة الفئات)
         const sections = [
             { id: "clothes", name: "الألبسة", icon: "fa-tshirt", shopCount: "12 محل" },
             { id: "beauty", name: "المكياج والعطور", icon: "fa-mask", shopCount: "8 محلات" },
@@ -393,10 +467,14 @@
             { id: "pharmacy", name: "الصيدلية", icon: "fa-tablets", shopCount: "2 محل" }
         ];
 
+        // إضافة خاصية category للمحلات في قسم الألبسة فقط (كمثال)
         const shopsData = {
             clothes: [
-                { id: "frat", name: "أزياء الفرات", floor: "الأول - مقابل السلم الكهربائي", images: ["https://placehold.co/600x300/f0e0b0/d4af37?text=أزياء+الفرات", "https://placehold.co/600x300/f0e0b0/d4af37?text=داخل+المحل"], phone: "0961234567" },
-                { id: "sharq", name: "موضة الشرق", floor: "الثاني - بجانب الكافتيريا", images: ["https://placehold.co/600x300/f0e0b0/d4af37?text=موضة+الشرق"], phone: "0961345678" }
+                { id: "frat", name: "أزياء الفرات", floor: "الأول - مقابل السلم الكهربائي", images: ["https://placehold.co/600x300/f0e0b0/d4af37?text=أزياء+الفرات", "https://placehold.co/600x300/f0e0b0/d4af37?text=داخل+المحل"], phone: "0961234567", category: "men" },
+                { id: "sharq", name: "موضة الشرق", floor: "الثاني - بجانب الكافتيريا", images: ["https://placehold.co/600x300/f0e0b0/d4af37?text=موضة+الشرق"], phone: "0961345678", category: "women" },
+                { id: "atfal", name: "عالم الأطفال", floor: "الأول - بالقرب من المصعد", images: ["https://placehold.co/600x300/f0e0b0/d4af37?text=عالم+الأطفال"], phone: "0961456789", category: "kids" },
+                { id: "rival", name: "رجل الأناقة", floor: "الأول - المدخل الرئيسي", images: ["https://placehold.co/600x300/f0e0b0/d4af37?text=رجل+الأناقة"], phone: "0961567890", category: "men" },
+                { id: "sara", name: "سارة للأزياء", floor: "الثاني - بجانب العطور", images: ["https://placehold.co/600x300/f0e0b0/d4af37?text=سارة+للأزياء"], phone: "0961678901", category: "women" }
             ],
             beauty: [
                 { id: "sham", name: "عطور الشام", floor: "الثاني - بجانب الصيدلية", images: ["https://placehold.co/600x300/f0e0b0/d4af37?text=عطور+الشام"], phone: "0961456789" },
@@ -417,7 +495,7 @@
             ]
         };
 
-        // بيانات المنتجات مع صور متعددة وألوان ومقاسات ووصف طويل (الألوان بالأكواد)
+        // بيانات المنتجات (كما هي مع صور وهمية)
         const productsData = {
             frat: [
                 { name: "قميص قطني", price: 20, icon: "fa-tshirt", longDesc: "قميص قطني ناعم 100%، مناسب للاستخدام اليومي. متوفر بألوان عصرية ومقاسات مختلفة.", images: ["https://placehold.co/400x400/e8f0e8/2c5f2d?text=قميص+1", "https://placehold.co/400x400/f0e8e8/8b4513?text=قميص+2", "https://placehold.co/400x400/e8e8f0/4a6c8f?text=قميص+3"], colors: ["#ffffff","#000000","#3366cc"], sizes: ["S","M","L","XL"] },
@@ -460,27 +538,7 @@
             { title: "🍽️ مهرجان الطعام", date: "10 مايو" }
         ];
 
-        // دالة تحويل الكود اللوني إلى اسم عربي
-        function getColorName(hexCode) {
-            const colorMap = {
-                '#ffffff': 'أبيض',
-                '#000000': 'أسود',
-                '#3366cc': 'أزرق',
-                '#9b59b6': 'أرجواني',
-                '#e74c3c': 'أحمر',
-                '#2ecc71': 'أخضر',
-                '#34495e': 'كحلي',
-                '#2c3e50': 'رمادي داكن',
-                '#d4af37': 'ذهبي',
-                '#b8860b': 'ذهبي داكن',
-                '#ff6b6b': 'وردي',
-                '#cc3333': 'أحمر قاني',
-                '#3498db': 'أزرق فاتح',
-                '#2980b9': 'أزرق متوسط'
-            };
-            return colorMap[hexCode] || 'لون آخر';
-        }
-
+        // دوال مساعدة (toast، سلة، إلخ)
         function showToast(message, type = "info") {
             const toast = document.getElementById('toast');
             toast.innerHTML = `<i class="fas ${type === 'error' ? 'fa-exclamation-circle' : type === 'warning' ? 'fa-exclamation-triangle' : 'fa-check-circle'}"></i> ${message}`;
@@ -495,6 +553,16 @@
         let cart = [];
         function saveCart() { localStorage.setItem('mallCart', JSON.stringify(cart)); }
         function loadCart() { const saved = localStorage.getItem('mallCart'); if (saved) cart = JSON.parse(saved); updateCartUI(); }
+        function getColorName(hexCode) {
+            const colorMap = {
+                '#ffffff': 'أبيض', '#000000': 'أسود', '#3366cc': 'أزرق', '#9b59b6': 'أرجواني',
+                '#e74c3c': 'أحمر', '#2ecc71': 'أخضر', '#34495e': 'كحلي', '#2c3e50': 'رمادي داكن',
+                '#d4af37': 'ذهبي', '#b8860b': 'ذهبي داكن', '#ff6b6b': 'وردي', '#cc3333': 'أحمر قاني',
+                '#3498db': 'أزرق فاتح', '#2980b9': 'أزرق متوسط'
+            };
+            return colorMap[hexCode] || 'لون آخر';
+        }
+
         function addToCart(shopId, shopName, productName, price, quantity = 1, colorHex = '', size = '') {
             const colorName = colorHex ? getColorName(colorHex) : '';
             const existingIndex = cart.findIndex(item => item.shopId === shopId && item.productName === productName && item.color === colorName && item.size === size);
@@ -549,7 +617,6 @@
             container.innerHTML = html;
             totalDiv.style.display = 'flex';
             grandTotalSpan.innerText = `${grandTotal} $`;
-            // ربط الأحداث
             document.querySelectorAll('.qty-minus').forEach(btn => btn.onclick = (e) => {
                 const idx = parseInt(btn.dataset.index);
                 if (cart[idx].quantity > 1) { cart[idx].quantity--; saveCart(); updateCartUI(); showToast(`تم تحديث كمية ${cart[idx].productName}`, "info"); }
@@ -574,14 +641,12 @@
             const address = document.getElementById('customerAddress').value.trim();
             if (!name || !phone || !address) { showToast('⚠️ الرجاء إدخال الاسم، رقم الجوال، والعنوان', "warning"); return; }
             if (cart.length === 0) { showToast('⚠️ السلة فارغة، أضف منتجات أولاً', "warning"); return; }
-            
             const grouped = {};
             cart.forEach(item => {
                 if (!grouped[item.shopId]) grouped[item.shopId] = { shopName: item.shopName, items: [], total: 0 };
                 grouped[item.shopId].items.push(item);
                 grouped[item.shopId].total += item.price * item.quantity;
             });
-            
             let productsDetails = '';
             let grandTotal = 0;
             for (const shopId in grouped) {
@@ -595,29 +660,10 @@
                 });
                 productsDetails += `━━━━━━━━━━━━━━━━━━━━\n`;
             }
-            
             const orderNumber = `TABQA-${Date.now()}`;
             const shamCashNumber = "0961234567";
             const adminNumber = "963934175735";
-            
-            const message = `📦 *طلب جديد - مول الطبقة* 📦
-🆔 #${orderNumber}
-
-👤 *العميل:* ${name}
-📞 *الجوال:* ${phone}
-📍 *العنوان:* ${address}
-
-💰 *الإجمالي الكلي:* ${grandTotal} $
-
-📋 *تفاصيل الطلب*
-━━━━━━━━━━━━━━━━━━━━
-${productsDetails}
-*لتأكيد طلب التسوق*
-
-💳 *طريقة الدفع:* شام كاش
-📱 *رقم محفظة شام كاش:* ${shamCashNumber}
-📝 *تعليمات الدفع:* يرجى تحويل المبلغ إلى رقم شام كاش أعلاه، ثم إرسال صورة الإيصال عبر واتساب لتأكيد الطلب.`;
-            
+            const message = `📦 *طلب جديد - مول الطبقة* 📦\n🆔 #${orderNumber}\n\n👤 *العميل:* ${name}\n📞 *الجوال:* ${phone}\n📍 *العنوان:* ${address}\n\n💰 *الإجمالي الكلي:* ${grandTotal} $\n\n📋 *تفاصيل الطلب*\n━━━━━━━━━━━━━━━━━━━━\n${productsDetails}\n*لتأكيد طلب التسوق*\n\n💳 *طريقة الدفع:* شام كاش\n📱 *رقم محفظة شام كاش:* ${shamCashNumber}\n📝 *تعليمات الدفع:* يرجى تحويل المبلغ إلى رقم شام كاش أعلاه، ثم إرسال صورة الإيصال عبر واتساب لتأكيد الطلب.`;
             window.open(`https://wa.me/${adminNumber}?text=${encodeURIComponent(message)}`, '_blank');
             showToast(`📨 تم توجيهك إلى واتساب لإرسال الطلب`, "info");
         }
@@ -636,6 +682,9 @@ ${productsDetails}
             more: document.getElementById('more-page')
         };
         let currentSectionId = null;
+        let currentFilter = 'all';
+        let currentShopsData = [];
+
         function showPage(pageId) {
             Object.values(pages).forEach(p => p.classList.remove('active-page'));
             pages[pageId].classList.add('active-page');
@@ -652,14 +701,19 @@ ${productsDetails}
             sectionsContainer.appendChild(div);
         });
 
-        // عرض المحلات
-        function showShops(sectionId, sectionName) {
-            currentSectionId = sectionId;
-            document.getElementById('shopsTitle').innerText = `محلات ${sectionName}`;
-            const shops = shopsData[sectionId] || [];
+        // عرض المحلات مع الفلتر
+        function renderShopsWithFilter() {
             const container = document.getElementById('shopsListContainer');
+            let filteredShops = currentShopsData;
+            if (currentFilter !== 'all') {
+                filteredShops = currentShopsData.filter(shop => shop.category === currentFilter);
+            }
+            if (filteredShops.length === 0) {
+                container.innerHTML = '<div class="card"><div class="card-content">لا توجد محلات في هذا التصنيف</div></div>';
+                return;
+            }
             container.innerHTML = '';
-            shops.forEach(shop => {
+            filteredShops.forEach(shop => {
                 const shopDiv = document.createElement('div'); shopDiv.className = 'shop-card';
                 const sliderId = `shopSlider_${shop.id}`;
                 let imagesHtml = '';
@@ -679,10 +733,35 @@ ${productsDetails}
                     setInterval(() => { slideIdx = (slideIdx + 1) % track.children.length; track.style.transform = `translateX(-${slideIdx * 100}%)`; }, 4000);
                 }
             });
+        }
+
+        function showShops(sectionId, sectionName) {
+            currentSectionId = sectionId;
+            document.getElementById('shopsTitle').innerText = `محلات ${sectionName}`;
+            currentShopsData = shopsData[sectionId] || [];
+            const filterWrapper = document.getElementById('filterWrapper');
+            // إظهار الفلتر فقط لقسم الألبسة (حيث توجد فئات)
+            if (sectionId === 'clothes' && currentShopsData.some(shop => shop.category)) {
+                filterWrapper.style.display = 'block';
+                // إعادة تعيين الفلتر إلى 'all'
+                currentFilter = 'all';
+                document.getElementById('filterSelect').value = 'all';
+            } else {
+                filterWrapper.style.display = 'none';
+                currentFilter = 'all';
+            }
+            renderShopsWithFilter();
             showPage('shops');
         }
 
-        // عرض المنتجات (بطاقات بدون سعر وبدون زر إضافة)
+        // فلتر القائمة المنسدلة
+        const filterSelect = document.getElementById('filterSelect');
+        filterSelect.addEventListener('change', (e) => {
+            currentFilter = e.target.value;
+            renderShopsWithFilter();
+        });
+
+        // عرض المنتجات
         function showProducts(shopId, shopName) {
             document.getElementById('productsTitle').innerText = `منتجات ${shopName}`;
             const products = productsData[shopId] || [];
@@ -698,7 +777,7 @@ ${productsDetails}
             showPage('products');
         }
 
-        // نافذة تفاصيل المنتج (مودال) مع تحويل الألوان إلى أسماء
+        // مودال المنتج (كما هو)
         const modal = document.getElementById('productModal');
         const modalTitle = document.getElementById('modalTitle');
         const modalPrice = document.getElementById('modalPrice');
@@ -727,7 +806,6 @@ ${productsDetails}
             modalDesc.innerText = product.longDesc || 'وصف المنتج غير متوفر';
             currentImages = product.images || [`https://placehold.co/400x400/f0e0b0/d4af37?text=${encodeURIComponent(product.name)}`];
             modalMainImg.src = currentImages[0];
-            // الصور المصغرة
             modalThumbs.innerHTML = '';
             currentImages.forEach((img, idx) => {
                 const thumb = document.createElement('img');
@@ -741,7 +819,6 @@ ${productsDetails}
                 });
                 modalThumbs.appendChild(thumb);
             });
-            // الألوان (تخزين الكود الداخلي وعرض الدوائر)
             modalColorsDiv.innerHTML = '';
             currentColorHex = '';
             if (product.colors && product.colors.length) {
@@ -762,7 +839,6 @@ ${productsDetails}
                 modalColorsDiv.innerHTML = '<span style="color:#6c757d;">لا توجد ألوان متوفرة</span>';
                 currentColorHex = '';
             }
-            // المقاسات
             modalSizesDiv.innerHTML = '';
             currentSize = '';
             if (product.sizes && product.sizes.length) {
@@ -783,7 +859,6 @@ ${productsDetails}
                 modalSizesDiv.innerHTML = '<span style="color:#6c757d;">مقاس واحد</span>';
                 currentSize = '';
             }
-            // تعيين الاختيارات الافتراضية
             if (product.colors && product.colors.length) currentColorHex = product.colors[0];
             if (product.sizes && product.sizes.length) currentSize = product.sizes[0];
             modal.style.display = 'block';
@@ -805,9 +880,7 @@ ${productsDetails}
         document.getElementById('backToShopsBtn').addEventListener('click', () => { if (currentSectionId) { const sec = sections.find(s => s.id === currentSectionId); showShops(currentSectionId, sec.name); } });
         document.querySelectorAll('.nav-btn').forEach(btn => btn.addEventListener('click', () => showPage(btn.dataset.page)));
 
-        const mainTrack = document.getElementById('mainSliderTrack');
-        if(mainTrack){ const slides = mainTrack.children; let idx = 0; setInterval(() => { idx = (idx + 1) % slides.length; mainTrack.style.transform = `translateX(-${idx * 100}%)`; }, 4000); }
-
+        // العروض والفعاليات
         const offersDiv = document.getElementById('offersList');
         offers.forEach(o => { const div = document.createElement('div'); div.className = 'offer-item'; div.innerHTML = `<span>${o.title}</span><button class="copy-btn" data-code="${o.code}">نسخ ${o.code}</button>`; offersDiv.appendChild(div); });
         document.querySelectorAll('.copy-btn').forEach(btn => btn.onclick = () => { navigator.clipboard.writeText(btn.dataset.code); btn.textContent = '✓'; setTimeout(() => btn.textContent = `نسخ ${btn.dataset.code}`, 1500); showToast(`📋 تم نسخ الكود`); });
@@ -815,6 +888,7 @@ ${productsDetails}
         events.forEach(e => { const div = document.createElement('div'); div.className = 'event-item'; div.innerHTML = `<span><strong>${e.title}</strong><br>📅 ${e.date}</span>`; eventsDiv.appendChild(div); });
         loadCart();
 
+        // PWA
         let deferredPrompt;
         const installBtn = document.getElementById('installAppBtn');
         window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; installBtn.style.display = 'flex'; });
