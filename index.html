@@ -55,7 +55,6 @@
             object-fit: cover;
             transition: opacity 0.3s ease;
         }
-        /* باقي الأنماط (كما هي) */
         .shop-slider-container { width: 100%; overflow: hidden; border-radius: 16px; margin-bottom: 12px; }
         .shop-slider-track { display: flex; transition: transform 0.5s ease-in-out; }
         .shop-slider-slide { flex: 0 0 100%; }
@@ -78,61 +77,25 @@
             gap: 8px;
         }
         .back-btn-shops {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: #d4af37;
-            width: 40px;
-            text-align: center;
+            background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #d4af37; width: 40px; text-align: center;
         }
         .shops-title {
-            font-size: 1.4rem;
-            font-weight: 700;
-            color: #212529;
-            text-align: center;
-            flex: 1;
-            white-space: nowrap;
+            font-size: 1.4rem; font-weight: 700; color: #212529; text-align: center; flex: 1; white-space: nowrap;
         }
         .filter-select-wrapper {
-            position: relative;
-            width: 110px;
+            position: relative; width: 110px;
         }
         .filter-select {
-            appearance: none;
-            -webkit-appearance: none;
-            width: 100%;
-            background: white;
-            border: 1px solid #d4af37;
-            border-radius: 40px;
-            padding: 6px 24px 6px 10px;
-            font-family: 'Cairo', sans-serif;
-            font-weight: 600;
-            font-size: 0.8rem;
-            color: #212529;
-            cursor: pointer;
-            outline: none;
+            appearance: none; -webkit-appearance: none; width: 100%; background: white; border: 1px solid #d4af37;
+            border-radius: 40px; padding: 6px 24px 6px 10px; font-family: 'Cairo', sans-serif; font-weight: 600;
+            font-size: 0.8rem; color: #212529; cursor: pointer; outline: none;
         }
         .filter-select-wrapper::after {
-            content: "\f0d7";
-            font-family: "Font Awesome 6 Free";
-            font-weight: 900;
-            position: absolute;
-            left: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #d4af37;
-            pointer-events: none;
-            font-size: 12px;
+            content: "\f0d7"; font-family: "Font Awesome 6 Free"; font-weight: 900; position: absolute;
+            left: 10px; top: 50%; transform: translateY(-50%); color: #d4af37; pointer-events: none; font-size: 12px;
         }
         .shops-list { display: flex; flex-direction: column; gap: 20px; }
-        .shop-card {
-            background: white;
-            border-radius: 20px;
-            overflow: hidden;
-            border: 1px solid #f0e0b0;
-            transition: 0.2s;
-        }
+        .shop-card { background: white; border-radius: 20px; overflow: hidden; border: 1px solid #f0e0b0; transition: 0.2s; }
         .shop-card:active { background: #fffaf5; transform: translateY(-2px); }
         .shop-header { padding: 14px 16px; border-bottom: 1px solid #f0e0b0; text-align: center; }
         .shop-header h3 { font-size: 1.2rem; font-weight: 700; color: #212529; }
@@ -141,33 +104,20 @@
         .shop-location { text-align: center; margin: 0 16px 12px; font-size: 0.85rem; color: #495057; }
         .shop-location i { color: #d4af37; margin-left: 5px; }
         .shop-products-btn {
-            background: #d4af37;
-            margin: 12px 16px 20px;
-            padding: 10px;
-            border-radius: 40px;
-            text-align: center;
-            color: #212529;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            cursor: pointer;
-            border: none;
-            width: calc(100% - 32px);
+            background: #d4af37; margin: 12px 16px 20px; padding: 10px; border-radius: 40px; text-align: center;
+            color: #212529; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px;
+            cursor: pointer; border: none; width: calc(100% - 32px);
         }
         .shop-products-btn:active { background: #c9a82e; transform: scale(0.98); }
         .products-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 16px; }
         .product-card {
-            background: white; border-radius: 20px; overflow: hidden; border: 1px solid #f0e0b0;
-            cursor: pointer; transition: 0.2s;
-            text-align: center;
-            padding: 16px 8px;
+            background: white; border-radius: 20px; overflow: hidden; border: 1px solid #f0e0b0; cursor: pointer;
+            transition: 0.2s; text-align: center; padding: 16px 8px;
         }
         .product-card:active { transform: scale(0.97); background: #fffaf5; }
         .product-card i { font-size: 48px; color: #d4af37; margin-bottom: 8px; display: block; }
         .product-card h4 { font-size: 1rem; font-weight: 600; margin: 0; }
-        /* أنماط السلة والمزيد (كما هي) */
+        /* أنماط السلة والمزيد */
         .cart-container { max-width: 500px; margin: 0 auto; }
         .cart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
         .clear-cart-btn { background: none; border: none; color: #dc3545; font-size: 0.9rem; cursor: pointer; display: flex; align-items: center; gap: 5px; padding: 6px 12px; border-radius: 30px; }
@@ -211,7 +161,7 @@
         .top-bar { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; background: white; padding: 8px 12px; border-radius: 40px; border: 1px solid #f0e0b0; }
         .back-btn { background: none; border: none; font-size: 22px; cursor: pointer; color: #d4af37; }
         footer { text-align: center; font-size: 11px; color: #adb5bd; padding: 16px; }
-        /* أنماط الجولة التعريفية (كما هي) */
+        /* أنماط الجولة التعريفية */
         .onboarding-screen { position: fixed; top:0; left:0; width:100%; height:100%; background:#0a0a0a; z-index:1000; }
         .onboarding-slide { position: absolute; top:0; left:0; width:100%; height:100%; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; background-size: cover; background-position: center; opacity: 0; transform: scale(1.05); transition: opacity 0.6s ease, transform 0.6s ease; }
         .onboarding-slide.active { opacity: 1; transform: scale(1); z-index: 2; }
@@ -227,7 +177,7 @@
         .onboarding-buttons { position: absolute; bottom:30px; left:0; right:0; display:flex; justify-content:center; gap:16px; padding:0 20px; z-index:10; }
         .btn-onboard-secondary { background:rgba(255,255,255,0.15); backdrop-filter:blur(10px); color:white; border:1px solid rgba(255,255,255,0.3); padding:12px 28px; border-radius:50px; font-weight:600; cursor:pointer; }
         .btn-onboard-primary { background:linear-gradient(135deg,#d4af37,#c9a82e); color:#000; box-shadow:0 4px 15px rgba(212,175,55,0.3); padding:12px 28px; border-radius:50px; font-weight:600; cursor:pointer; }
-        /* مودال المنتج (كما هو) */
+        /* مودال المنتج */
         .modal {
             display: none;
             position: fixed;
@@ -360,40 +310,24 @@
 
     <!-- الصفحة الرئيسية (مع شريط العنوان القديم) -->
     <div id="home-page" class="page active-page">
-        <!-- الشريط العلوي: اسم المركز + الإموجي -->
         <div class="home-header">
             <div class="shopping-emoji">🛍️</div>
             <h1>سنتر مول الطبقة</h1>
-            <div style="width: 2rem;"></div> <!-- لتحقيق التوازن -->
+            <div style="width: 2rem;"></div>
         </div>
-
-        <!-- السلايدر -->
         <div class="card">
             <div class="slider-container">
                 <img id="mainSliderImage" src="https://raw.githubusercontent.com/2001abdalrahman2001-pixel/Mol-altapqa/main/photo_2026-04-09_13-53-35.jpg" alt="معرض مول الطبقة">
             </div>
         </div>
-
-        <!-- ساعات العمل -->
-        <div class="card">
-            <div class="card-content">
-                <h3>📍 أوقات العمل</h3>
-                <p>يومياً: 10ص - 11م<br>الجمعة: 2م - 11م</p>
-            </div>
-        </div>
-
-        <!-- موقع المول (الخريطة) -->
-        <div class="card">
-            <div class="card-content">
-                <h3>🗺️ موقعنا</h3>
-                <iframe style="width:100%; height:160px; border-radius:16px; border:0;" src="https://www.openstreetmap.org/export/embed.html?bbox=38.54035556316376%2C35.83516740061013%2C38.544185757637024%2C35.837315757030105&amp;layer=mapnik&amp;marker=35.836242%2C38.542271"></iframe>
-            </div>
-        </div>
+        <div class="card"><div class="card-content"><h3>📍 أوقات العمل</h3><p>يومياً: 10ص - 11م<br>الجمعة: 2م - 11م</p></div></div>
+        <div class="card"><div class="card-content"><h3>🗺️ موقعنا</h3><iframe style="width:100%; height:160px; border-radius:16px; border:0;" src="https://www.openstreetmap.org/export/embed.html?bbox=38.54035556316376%2C35.83516740061013%2C38.544185757637024%2C35.837315757030105&amp;layer=mapnik&amp;marker=35.836242%2C38.542271"></iframe></div></div>
     </div>
 
-    <!-- باقي الصفحات (الأقسام، المحلات، المنتجات، السلة، العروض، المزيد) كما هي دون تغيير -->
+    <!-- الأقسام -->
     <div id="sections-page" class="page"><div class="card"><div class="card-content"><h3>اختر القسم</h3><div class="sections-grid" id="sectionsContainer"></div></div></div></div>
 
+    <!-- المحلات مع الفلتر -->
     <div id="shops-page" class="page">
         <div class="shops-header">
             <button class="back-btn-shops" id="backToSectionsBtn"><i class="fas fa-arrow-right"></i></button>
@@ -410,12 +344,16 @@
         <div class="shops-list" id="shopsListContainer"></div>
     </div>
 
+    <!-- المنتجات -->
     <div id="products-page" class="page"><div class="top-bar"><button class="back-btn" id="backToShopsBtn"><i class="fas fa-arrow-right"></i></button><h3 id="productsTitle">منتجات المحل</h3></div><div class="products-grid" id="productsListContainer"></div></div>
 
+    <!-- السلة -->
     <div id="cart-page" class="page"><div class="cart-container"><div class="card"><div class="card-content"><div class="cart-header"><h3><i class="fas fa-shopping-cart"></i> سلة المشتريات</h3><button id="clearCartBtn" class="clear-cart-btn"><i class="fas fa-trash-alt"></i> تفريغ السلة</button></div><div class="customer-details"><h4>👤 بياناتك للطلب</h4><div class="input-row"><div class="input-icon"><i class="fas fa-user"></i><input type="text" id="customerName" placeholder="الاسم الكامل"></div><div class="input-icon"><i class="fas fa-phone-alt"></i><input type="tel" id="customerPhone" placeholder="رقم الجوال"></div></div><div class="input-icon"><i class="fas fa-map-marker-alt"></i><input type="text" id="customerAddress" placeholder="العنوان"></div></div><div class="cart-items" id="cartItemsContainer"></div><div id="cartTotal" class="cart-total" style="display:none;"><span>💰 الإجمالي النهائي:</span><span id="grandTotalValue">0 $</span></div><div class="action-bar"><button id="continueShoppingBtn" class="btn btn-secondary"><i class="fas fa-arrow-right"></i> متابعة التسوق</button><button id="sendOrderBtn" class="btn btn-primary"><i class="fab fa-whatsapp"></i> إرسال الطلب (شام كاش)</button></div></div></div></div></div>
 
+    <!-- العروض + فعاليات -->
     <div id="offers-page" class="page"><div class="card"><div class="card-content"><h3>🔥 عروض اليوم</h3><div id="offersList"></div></div></div><div class="card"><div class="card-content"><h3>📅 فعاليات قادمة</h3><div id="eventsList"></div></div></div></div>
 
+    <!-- المزيد -->
     <div id="more-page" class="page"><div class="card"><div class="card-content"><h3>🏢 عن مول الطبقة</h3><div class="info-text">مول الطبقة هو أكبر مول تجاري في مدينة الطبقة، يضم ثلاث طوابق تضم أقسام الألبسة، المكياج والعطور، الإلكترونيات، المطاعم، الصالونات، والصيدلية.</div><button id="installAppBtn" class="install-btn" style="display: none;"><i class="fas fa-download"></i> 📲 تثبيت إلى الشاشة الرئيسية</button><div class="policy-text"><strong>🔄 سياسة الاستبدال:</strong> يمكن استبدال المنتجات خلال 7 أيام من تاريخ الشراء، بشرط أن تكون بحالة جديدة، مع إرفاق الفاتورة الأصلية. لا يشمل الاستبدال المنتجات الغذائية والأدوية.</div><div class="info-text"><i class="fas fa-map-marker-alt"></i> <strong>العنوان:</strong> مدينة الطبقة - بالقرب من سد الفرات<br><i class="fas fa-phone-alt"></i> <strong>هاتف إضافي:</strong> 0961234567</div></div></div></div>
     <footer>مول الطبقة - سوريا</footer>
 </div>
@@ -424,7 +362,7 @@
 <div id="confirmClearOverlay" class="confirm-overlay"><div class="confirm-box"><p>هل أنت متأكد من تفريغ السلة بالكامل؟</p><button class="confirm-yes" id="confirmClearYes">نعم، تفريغ</button><button class="confirm-no" id="confirmClearNo">إلغاء</button></div></div>
 
 <script>
-    // ========== الجولة التعريفية (نفسها) ==========
+    // ========== الجولة التعريفية ==========
     const onboardingScreen = document.getElementById('onboardingScreen');
     const mainApp = document.getElementById('mainApp');
     const onboardingSlides = document.querySelectorAll('#onboardingScreen .onboarding-slide');
@@ -490,7 +428,7 @@
         }
         setInterval(nextSliderImage, 4000);
 
-        // بيانات الأقسام والمحلات والمنتجات (مع إضافة الفئات)
+        // بيانات الأقسام والمحلات والمنتجات
         const sections = [
             { id: "clothes", name: "الألبسة", icon: "fa-tshirt", shopCount: "12 محل" },
             { id: "beauty", name: "المكياج والعطور", icon: "fa-mask", shopCount: "8 محلات" },
@@ -569,7 +507,6 @@
             { title: "🍽️ مهرجان الطعام", date: "10 مايو" }
         ];
 
-        // دوال مساعدة (toast، سلة، إلخ) – كما هي سابقاً (اختصاراً، سأضعها مختصرة)
         function showToast(message, type = "info") {
             const toast = document.getElementById('toast');
             toast.innerHTML = `<i class="fas ${type === 'error' ? 'fa-exclamation-circle' : type === 'warning' ? 'fa-exclamation-triangle' : 'fa-check-circle'}"></i> ${message}`;
@@ -580,29 +517,132 @@
             setTimeout(() => toast.style.display = 'none', 2500);
         }
 
+        // سلة المشتريات
         let cart = [];
         function saveCart() { localStorage.setItem('mallCart', JSON.stringify(cart)); }
         function loadCart() { const saved = localStorage.getItem('mallCart'); if (saved) cart = JSON.parse(saved); updateCartUI(); }
-        function getColorName(hexCode) { /* نفس الدالة */ return 'لون'; }
-        function addToCart(shopId, shopName, productName, price, quantity = 1, colorHex = '', size = '') {
-            const colorName = colorHex ? (getColorName(colorHex) || 'لون') : '';
-            const existingIndex = cart.findIndex(item => item.shopId === shopId && item.productName === productName && item.color === colorName && item.size === size);
-            if (existingIndex !== -1) cart[existingIndex].quantity += quantity;
-            else cart.push({ shopId, shopName, productName, price, quantity, color: colorName, size, icon: "fa-tag" });
-            saveCart(); updateCartUI();
-            showToast(`✅ تمت إضافة ${productName} × ${quantity}`);
+        function getColorName(hexCode) {
+            const colorMap = {
+                '#ffffff': 'أبيض', '#000000': 'أسود', '#3366cc': 'أزرق', '#9b59b6': 'أرجواني',
+                '#e74c3c': 'أحمر', '#2ecc71': 'أخضر', '#34495e': 'كحلي', '#2c3e50': 'رمادي داكن',
+                '#d4af37': 'ذهبي', '#b8860b': 'ذهبي داكن', '#ff6b6b': 'وردي', '#cc3333': 'أحمر قاني',
+                '#3498db': 'أزرق فاتح', '#2980b9': 'أزرق متوسط'
+            };
+            return colorMap[hexCode] || 'لون آخر';
         }
-        function updateCartUI() { /* كما هي سابقاً – اختصاراً */ }
-        function clearCart() { cart = []; saveCart(); updateCartUI(); showToast(`🗑️ تم تفريغ السلة`, "error"); }
-        function sendOrder() { /* كما هي سابقاً – سأحتفظ بالدالة الكاملة */ }
 
-        // ربط أحداث السلة (اختصار)
+        function addToCart(shopId, shopName, productName, price, quantity = 1, colorHex = '', size = '') {
+            const colorName = colorHex ? getColorName(colorHex) : '';
+            const existingIndex = cart.findIndex(item => item.shopId === shopId && item.productName === productName && item.color === colorName && item.size === size);
+            if (existingIndex !== -1) {
+                cart[existingIndex].quantity += quantity;
+            } else {
+                cart.push({ shopId, shopName, productName, price, quantity, color: colorName, size, icon: "fa-tag" });
+            }
+            saveCart(); updateCartUI();
+            showToast(`✅ تمت إضافة ${productName}${colorName ? ` (${colorName})` : ''}${size ? ` (${size})` : ''} × ${quantity}`);
+        }
+
+        function updateCartUI() {
+            const container = document.getElementById('cartItemsContainer');
+            const totalDiv = document.getElementById('cartTotal');
+            const grandTotalSpan = document.getElementById('grandTotalValue');
+            if (!container) return;
+            if (cart.length === 0) {
+                container.innerHTML = '<p style="text-align:center; color:#6c757d; padding:20px;">السلة فارغة</p>';
+                totalDiv.style.display = 'none';
+                return;
+            }
+            const grouped = {};
+            cart.forEach(item => {
+                if (!grouped[item.shopId]) grouped[item.shopId] = { shopName: item.shopName, items: [] };
+                grouped[item.shopId].items.push(item);
+            });
+            let html = '', grandTotal = 0;
+            for (const shopId in grouped) {
+                const group = grouped[shopId];
+                let shopTotal = 0;
+                html += `<div class="cart-shop-group"><div class="cart-shop-title">🏬 ${group.shopName}</div>`;
+                group.items.forEach((item, idx) => {
+                    const itemTotal = item.price * item.quantity;
+                    shopTotal += itemTotal;
+                    grandTotal += itemTotal;
+                    const globalIndex = cart.findIndex(i => i.shopId === item.shopId && i.productName === item.productName && i.color === item.color && i.size === item.size);
+                    html += `<div class="cart-product-row">
+                                <div class="cart-product-img"><i class="fas ${item.icon}"></i></div>
+                                <div class="cart-product-info"><div class="cart-product-name">${item.productName} ${item.color ? `(${item.color})` : ''} ${item.size ? `(${item.size})` : ''}</div><div class="cart-product-unit-price">${item.price} $ / قطعة</div></div>
+                                <div class="cart-product-price">${itemTotal} $</div>
+                                <div class="cart-quantity"><button class="qty-minus" data-index="${globalIndex}">-</button><span>${item.quantity}</span><button class="qty-plus" data-index="${globalIndex}">+</button></div>
+                                <button class="cart-remove" data-index="${globalIndex}"><i class="fas fa-trash-alt"></i></button>
+                            </div>`;
+                });
+                html += `</div>`;
+                setTimeout(() => {
+                    const span = document.getElementById(`shopTotal_${shopId}`);
+                    if (span) span.innerText = `إجمالي القسم: ${shopTotal} $`;
+                }, 0);
+            }
+            container.innerHTML = html;
+            totalDiv.style.display = 'flex';
+            grandTotalSpan.innerText = `${grandTotal} $`;
+            document.querySelectorAll('.qty-minus').forEach(btn => btn.onclick = (e) => {
+                const idx = parseInt(btn.dataset.index);
+                if (cart[idx].quantity > 1) { cart[idx].quantity--; saveCart(); updateCartUI(); showToast(`تم تحديث كمية ${cart[idx].productName}`, "info"); }
+                else showToast(`لا يمكن أن تقل الكمية عن 1`, "warning");
+            });
+            document.querySelectorAll('.qty-plus').forEach(btn => btn.onclick = (e) => {
+                const idx = parseInt(btn.dataset.index);
+                cart[idx].quantity++; saveCart(); updateCartUI(); showToast(`تم تحديث كمية ${cart[idx].productName}`, "info");
+            });
+            document.querySelectorAll('.cart-remove').forEach(btn => btn.onclick = (e) => {
+                const idx = parseInt(btn.dataset.index);
+                const name = cart[idx].productName;
+                cart.splice(idx,1); saveCart(); updateCartUI(); showToast(`🗑️ تم حذف ${name}`, "error");
+            });
+        }
+
+        function clearCart() { cart = []; saveCart(); updateCartUI(); showToast(`🗑️ تم تفريغ السلة بالكامل`, "error"); }
+
+        function sendOrder() {
+            const name = document.getElementById('customerName').value.trim();
+            const phone = document.getElementById('customerPhone').value.trim();
+            const address = document.getElementById('customerAddress').value.trim();
+            if (!name || !phone || !address) { showToast('⚠️ الرجاء إدخال الاسم، رقم الجوال، والعنوان', "warning"); return; }
+            if (cart.length === 0) { showToast('⚠️ السلة فارغة، أضف منتجات أولاً', "warning"); return; }
+            const grouped = {};
+            cart.forEach(item => {
+                if (!grouped[item.shopId]) grouped[item.shopId] = { shopName: item.shopName, items: [], total: 0 };
+                grouped[item.shopId].items.push(item);
+                grouped[item.shopId].total += item.price * item.quantity;
+            });
+            let productsDetails = '';
+            let grandTotal = 0;
+            for (const shopId in grouped) {
+                const group = grouped[shopId];
+                productsDetails += `🏬 *${group.shopName}* (الإجمالي: ${group.total} $)\n\n`;
+                group.items.forEach(item => {
+                    const itemTotal = item.price * item.quantity;
+                    grandTotal += itemTotal;
+                    productsDetails += `   - ${item.productName}${item.color ? ` (${item.color})` : ''}${item.size ? ` (${item.size})` : ''}\n`;
+                    productsDetails += `               (${item.price}$) × ${item.quantity} = ${itemTotal} $\n`;
+                });
+                productsDetails += `━━━━━━━━━━━━━━━━━━━━\n`;
+            }
+            const orderNumber = `TABQA-${Date.now()}`;
+            const shamCashNumber = "0961234567";
+            const adminNumber = "963934175735";
+            const message = `📦 *طلب جديد - مول الطبقة* 📦\n🆔 #${orderNumber}\n\n👤 *العميل:* ${name}\n📞 *الجوال:* ${phone}\n📍 *العنوان:* ${address}\n\n💰 *الإجمالي الكلي:* ${grandTotal} $\n\n📋 *تفاصيل الطلب*\n━━━━━━━━━━━━━━━━━━━━\n${productsDetails}\n*لتأكيد طلب التسوق*\n\n💳 *طريقة الدفع:* شام كاش\n📱 *رقم محفظة شام كاش:* ${shamCashNumber}\n📝 *تعليمات الدفع:* يرجى تحويل المبلغ إلى رقم شام كاش أعلاه، ثم إرسال صورة الإيصال عبر واتساب لتأكيد الطلب.`;
+            window.open(`https://wa.me/${adminNumber}?text=${encodeURIComponent(message)}`, '_blank');
+            showToast(`📨 تم توجيهك إلى واتساب لإرسال الطلب`, "info");
+        }
+
         document.getElementById('clearCartBtn').addEventListener('click', () => document.getElementById('confirmClearOverlay').classList.add('active'));
         document.getElementById('confirmClearYes').addEventListener('click', () => { clearCart(); document.getElementById('confirmClearOverlay').classList.remove('active'); });
         document.getElementById('confirmClearNo').addEventListener('click', () => document.getElementById('confirmClearOverlay').classList.remove('active'));
         document.getElementById('sendOrderBtn').addEventListener('click', sendOrder);
         document.getElementById('continueShoppingBtn').addEventListener('click', () => showPage('sections'));
 
+        // التنقل بين الصفحات
         const pages = {
             home: document.getElementById('home-page'), sections: document.getElementById('sections-page'),
             shops: document.getElementById('shops-page'), products: document.getElementById('products-page'),
@@ -620,6 +660,7 @@
             if (pageId === 'cart') updateCartUI();
         }
 
+        // عرض الأقسام
         const sectionsContainer = document.getElementById('sectionsContainer');
         sections.forEach(section => {
             const div = document.createElement('div'); div.className = 'section-card';
@@ -632,19 +673,27 @@
             const container = document.getElementById('shopsListContainer');
             let filteredShops = currentShopsData;
             if (currentFilter !== 'all') filteredShops = currentShopsData.filter(shop => shop.category === currentFilter);
-            if (filteredShops.length === 0) { container.innerHTML = '<div class="card"><div class="card-content">لا توجد محلات</div></div>'; return; }
+            if (filteredShops.length === 0) { container.innerHTML = '<div class="card"><div class="card-content">لا توجد محلات في هذا التصنيف</div></div>'; return; }
             container.innerHTML = '';
             filteredShops.forEach(shop => {
                 const shopDiv = document.createElement('div'); shopDiv.className = 'shop-card';
                 const sliderId = `shopSlider_${shop.id}`;
                 let imagesHtml = '';
                 shop.images.forEach(img => { imagesHtml += `<div class="shop-slider-slide"><img src="${img}" alt="${shop.name}"></div>`; });
-                shopDiv.innerHTML = `<div class="shop-header"><h3>${shop.name}</h3></div><div class="shop-slider-container" id="${sliderId}"><div class="shop-slider-track" id="${sliderId}_track">${imagesHtml}</div></div><div class="shop-location"><i class="fas fa-location-dot"></i> الطابق ${shop.floor}</div><button class="shop-products-btn" data-shop-id="${shop.id}" data-shop-name="${shop.name}"><i class="fas fa-store"></i> اطلع على منتجاتنا</button>`;
+                shopDiv.innerHTML = `
+                    <div class="shop-header"><h3>${shop.name}</h3></div>
+                    <div class="shop-slider-container" id="${sliderId}"><div class="shop-slider-track" id="${sliderId}_track">${imagesHtml}</div></div>
+                    <div class="shop-location"><i class="fas fa-location-dot"></i> الطابق ${shop.floor}</div>
+                    <button class="shop-products-btn" data-shop-id="${shop.id}" data-shop-name="${shop.name}"><i class="fas fa-store"></i> اطلع على منتجاتنا</button>
+                `;
                 const btn = shopDiv.querySelector('.shop-products-btn');
                 btn.addEventListener('click', (e) => { e.stopPropagation(); showProducts(shop.id, shop.name); });
                 container.appendChild(shopDiv);
                 const track = document.getElementById(`${sliderId}_track`);
-                if(track && track.children.length) { let slideIdx = 0; setInterval(() => { slideIdx = (slideIdx + 1) % track.children.length; track.style.transform = `translateX(-${slideIdx * 100}%)`; }, 4000); }
+                if(track && track.children.length){
+                    let slideIdx = 0;
+                    setInterval(() => { slideIdx = (slideIdx + 1) % track.children.length; track.style.transform = `translateX(-${slideIdx * 100}%)`; }, 4000);
+                }
             });
         }
 
@@ -657,7 +706,10 @@
                 filterWrapper.style.display = 'block';
                 currentFilter = 'all';
                 document.getElementById('filterSelect').value = 'all';
-            } else { filterWrapper.style.display = 'none'; currentFilter = 'all'; }
+            } else {
+                filterWrapper.style.display = 'none';
+                currentFilter = 'all';
+            }
             renderShopsWithFilter();
             showPage('shops');
         }
@@ -680,22 +732,110 @@
             showPage('products');
         }
 
-        // مودال المنتج (كما هو سابقاً – اختصار)
+        // مودال المنتج
         const modal = document.getElementById('productModal');
-        // ... (سأحتفظ بالكود الكامل للمودال، لكن اختصاراً للطول سأضعه بشكل مبسط، مع العلم أنه موجود كاملاً في الرد السابق)
-        // هنا سأضيف دالة openProductModal كاملة، لكن للاختصار سأفترض أنها موجودة.
-        function openProductModal(shopId, shopName, product) { /* تم حذف التفاصيل للاختصار، لكنها موجودة في الكود الأصلي */ alert('تم'); }
+        const modalTitle = document.getElementById('modalTitle');
+        const modalPrice = document.getElementById('modalPrice');
+        const modalDesc = document.getElementById('modalDesc');
+        const modalMainImg = document.getElementById('modalMainImg');
+        const modalThumbs = document.getElementById('modalThumbs');
+        const modalColorsDiv = document.getElementById('modalColors');
+        const modalSizesDiv = document.getElementById('modalSizes');
+        const modalQtySpan = document.getElementById('modalQty');
+        let currentProduct = null;
+        let currentShopId = null;
+        let currentShopName = null;
+        let currentColorHex = '';
+        let currentSize = '';
+        let currentQty = 1;
+        let currentImages = [];
+
+        function openProductModal(shopId, shopName, product) {
+            currentShopId = shopId;
+            currentShopName = shopName;
+            currentProduct = product;
+            currentQty = 1;
+            modalQtySpan.innerText = currentQty;
+            modalTitle.innerText = product.name;
+            modalPrice.innerText = `${product.price} $ / قطعة`;
+            modalDesc.innerText = product.longDesc || 'وصف المنتج غير متوفر';
+            currentImages = product.images || [`https://placehold.co/400x400/f0e0b0/d4af37?text=${encodeURIComponent(product.name)}`];
+            modalMainImg.src = currentImages[0];
+            modalThumbs.innerHTML = '';
+            currentImages.forEach((img, idx) => {
+                const thumb = document.createElement('img');
+                thumb.src = img;
+                thumb.classList.add('thumb-img');
+                if (idx === 0) thumb.classList.add('active');
+                thumb.addEventListener('click', () => {
+                    modalMainImg.src = img;
+                    document.querySelectorAll('.thumb-img').forEach(t => t.classList.remove('active'));
+                    thumb.classList.add('active');
+                });
+                modalThumbs.appendChild(thumb);
+            });
+            modalColorsDiv.innerHTML = '';
+            currentColorHex = '';
+            if (product.colors && product.colors.length) {
+                product.colors.forEach(hex => {
+                    const colorCircle = document.createElement('div');
+                    colorCircle.style.backgroundColor = hex;
+                    colorCircle.classList.add('color-circle');
+                    if (currentColorHex === '') currentColorHex = hex;
+                    if (hex === currentColorHex) colorCircle.classList.add('selected');
+                    colorCircle.addEventListener('click', () => {
+                        document.querySelectorAll('#modalColors .color-circle').forEach(c => c.classList.remove('selected'));
+                        colorCircle.classList.add('selected');
+                        currentColorHex = hex;
+                    });
+                    modalColorsDiv.appendChild(colorCircle);
+                });
+            } else {
+                modalColorsDiv.innerHTML = '<span style="color:#6c757d;">لا توجد ألوان متوفرة</span>';
+                currentColorHex = '';
+            }
+            modalSizesDiv.innerHTML = '';
+            currentSize = '';
+            if (product.sizes && product.sizes.length) {
+                product.sizes.forEach(size => {
+                    const sizeBtn = document.createElement('div');
+                    sizeBtn.innerText = size;
+                    sizeBtn.classList.add('size-opt');
+                    if (currentSize === '') currentSize = size;
+                    if (size === currentSize) sizeBtn.classList.add('selected');
+                    sizeBtn.addEventListener('click', () => {
+                        document.querySelectorAll('#modalSizes .size-opt').forEach(s => s.classList.remove('selected'));
+                        sizeBtn.classList.add('selected');
+                        currentSize = size;
+                    });
+                    modalSizesDiv.appendChild(sizeBtn);
+                });
+            } else {
+                modalSizesDiv.innerHTML = '<span style="color:#6c757d;">مقاس واحد</span>';
+                currentSize = '';
+            }
+            if (product.colors && product.colors.length) currentColorHex = product.colors[0];
+            if (product.sizes && product.sizes.length) currentSize = product.sizes[0];
+            modal.style.display = 'block';
+        }
+
         function closeModal() { modal.style.display = 'none'; }
         document.querySelector('.modal-close').addEventListener('click', closeModal);
         window.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
-        document.getElementById('modalMinus').addEventListener('click', () => { /* ... */ });
-        document.getElementById('modalPlus').addEventListener('click', () => { /* ... */ });
-        document.getElementById('modalAddToCart').addEventListener('click', () => { /* ... */ });
+        document.getElementById('modalMinus').addEventListener('click', () => { if (currentQty > 1) { currentQty--; modalQtySpan.innerText = currentQty; } });
+        document.getElementById('modalPlus').addEventListener('click', () => { currentQty++; modalQtySpan.innerText = currentQty; });
+        document.getElementById('modalAddToCart').addEventListener('click', () => {
+            if (currentProduct) {
+                addToCart(currentShopId, currentShopName, currentProduct.name, currentProduct.price, currentQty, currentColorHex, currentSize);
+                closeModal();
+            }
+        });
 
         document.getElementById('backToSectionsBtn').addEventListener('click', () => showPage('sections'));
         document.getElementById('backToShopsBtn').addEventListener('click', () => { if (currentSectionId) { const sec = sections.find(s => s.id === currentSectionId); showShops(currentSectionId, sec.name); } });
         document.querySelectorAll('.nav-btn').forEach(btn => btn.addEventListener('click', () => showPage(btn.dataset.page)));
 
+        // العروض والفعاليات
         const offersDiv = document.getElementById('offersList');
         offers.forEach(o => { const div = document.createElement('div'); div.className = 'offer-item'; div.innerHTML = `<span>${o.title}</span><button class="copy-btn" data-code="${o.code}">نسخ ${o.code}</button>`; offersDiv.appendChild(div); });
         document.querySelectorAll('.copy-btn').forEach(btn => btn.onclick = () => { navigator.clipboard.writeText(btn.dataset.code); btn.textContent = '✓'; setTimeout(() => btn.textContent = `نسخ ${btn.dataset.code}`, 1500); showToast(`📋 تم نسخ الكود`); });
@@ -703,6 +843,7 @@
         events.forEach(e => { const div = document.createElement('div'); div.className = 'event-item'; div.innerHTML = `<span><strong>${e.title}</strong><br>📅 ${e.date}</span>`; eventsDiv.appendChild(div); });
         loadCart();
 
+        // PWA
         let deferredPrompt;
         const installBtn = document.getElementById('installAppBtn');
         window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; installBtn.style.display = 'flex'; });
