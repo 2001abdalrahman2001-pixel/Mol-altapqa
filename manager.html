@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>مدير المول | مول الطبقة</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script type="module">
+        // Firebase imports
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        // Firebase config (replace with your actual config)
+        const firebaseConfig = {
+    apiKey: "AIzaSyDp9VNr_SS9LOIZxjgogXbG7KQRoxaUJ_E",
+    authDomain: "mol-altapqa.firebaseapp.com",
+    projectId: "mol-altapqa",
+    storageBucket: "mol-altapqa.firebasestorage.app",
+    messagingSenderId: "8649488671",
+    appId: "1:8649488671:web:b1748ccf29851889e2182a",
+    measurementId: "G-1JWPLVKGPP"
+  };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Make db available globally
+        window.db = db;
+        window.collection = collection;
+        window.addDoc = addDoc;
+        window.getDocs = getDocs;
+        window.doc = doc;
+        window.updateDoc = updateDoc;
+        window.deleteDoc = deleteDoc;
+    </script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Cairo', sans-serif; background: #f5f3ef; direction: rtl; padding: 16px 12px 30px; min-height: 100vh; display: flex; flex-direction: column; }
+        .app-container { max-width: 480px; margin: 0 auto; width: 100%; }
+        .top-bar { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+        .back-link { color: #d4af37; text-decoration: none; font-size: 20px; }
+        .top-bar h1 { font-size: 1.5rem; font-weight: 700; color: #1e1e1e; flex: 1; }
+        .stats-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 20px; }
+        .stat-card { background: white; border-radius: 20px; padding: 8px 2px; text-align: center; border: 1px solid #f0e0b0; box-shadow: 0 4px 10px rgba(0,0,0,0.02); }
+        .stat-card h3 { font-size: 1.1rem; color: #d4af37; font-weight: 700; margin-bottom: 2px; }
+        .stat-card p { color: #5a5a5a; font-size: 0.6rem; }
+        .main-card { background: white; border-radius: 32px; border: 1px solid #f0e0b0; overflow: hidden; box-shadow: 0 6px 14px rgba(0,0,0,0.03); }
+        .card-header { background: #d4af37; padding: 18px 20px; color: #1e1e1e; font-weight: 700; font-size: 1.2rem; }
+        .card-body { padding: 18px 16px; }
+        .tabs { display: flex; gap: 8px; background: #faf7f2; padding: 6px; border-radius: 60px; margin-bottom: 22px; }
+        .tab-btn { flex: 1; background: transparent; border: none; padding: 10px 4px; border-radius: 40px; font-family: 'Cairo'; font-weight: 600; font-size: 0.8rem; color: #4a4a4a; cursor: pointer; white-space: nowrap; }
+        .tab-btn.active { background: #d4af37; color: #1e1e1e; box-shadow: 0 4px 8px rgba(212,175,55,0.2); }
+        .tab-pane { display: none; }
+        .tab-pane.active { display: block; }
+        .list-item { background: #fefcf8; border-radius: 24px; padding: 14px 16px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; border: 1px solid #f0e6d2; }
+        .item-info { display: flex; align-items: center; gap: 14px; flex: 1; }
+        .item-icon { width: 48px; height: 48px; background: #f5ede0; border-radius: 20px; display: flex; align-items: center; justify-content: center; color: #d4af37; font-size: 1.4rem; }
+        .shop-thumb { width: 48px; height: 48px; border-radius: 18px; object-fit: cover; background: #e0d0b0; }
+        .item-details h4 { font-weight: 700; font-size: 1rem; }
+        .item-details p { font-size: 0.75rem; color: #7e7e7e; margin-top: 4px; }
+        .item-actions { display: flex; gap: 8px; }
+        .action-btn { background: white; border: 1px solid #eee6d8; width: 36px; height: 36px; border-radius: 50%; color: #5a5a5a; font-size: 1rem; cursor: pointer; }
+        .danger-btn { color: #dc3545; border-color: #ffe3e3; }
+        .add-btn { background: #d4af37; border: none; width: 100%; padding: 14px; border-radius: 40px; font-weight: 700; font-size: 1rem; margin-top: 16px; display: flex; align-items: center; justify-content: center; gap: 8px; color: #1e1e1e; cursor: pointer; }
+        .filter-row { margin-bottom: 16px; display: flex; gap: 8px; }
+        .filter-select { flex: 1; padding: 12px 16px; border-radius: 30px; border: 1px solid #e0d0b0; background: white; font-family: 'Cairo'; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; align-items: center; justify-content: center; padding: 16px; }
+        .modal-content { background: white; width: 100%; max-width: 450px; border-radius: 32px; padding: 24px 20px; max-height: 90vh; overflow-y: auto; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .close-modal { font-size: 24px; cursor: pointer; color: #888; }
+        .form-group { margin-bottom: 18px; }
+        .form-group label { display: block; margin-bottom: 6px; font-weight: 600; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 14px 16px; border-radius: 24px; border: 1px solid #e0d6c0; font-family: 'Cairo'; }
+        .image-preview-container { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+        .image-preview { width: 70px; height: 70px; object-fit: cover; border-radius: 18px; border: 1px solid #e0d0b0; }
+        .toast-notification { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #212529; color: #d4af37; padding: 12px 24px; border-radius: 50px; z-index: 3000; font-weight: 600; display: none; }
+        .icon-preview { font-size: 28px; color: #d4af37; margin-right: 10px; }
+        .preview-img-wrapper { position: relative; display: inline-block; }
+        .preview-img-wrapper .remove-img { position: absolute; top: -6px; left: -6px; background: #dc3545; color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; }
+        .upload-actions { display: flex; gap: 10px; margin-top: 10px; }
+        .limit-note { font-size: 0.8rem; margin-top: 8px; color: #d4af37; }
+        .image-upload-area { border: 2px dashed #d4af37; border-radius: 24px; padding: 20px; text-align: center; background: #fefcf5; margin: 15px 0; cursor: pointer; }
+        .image-upload-area i { font-size: 32px; color: #d4af37; margin-bottom: 8px; }
+    </style>
+</head>
+<body>
+<div class="app-container">
+  <div class="top-bar">
+    <a href="index.html" class="back-link"><i class="fas fa-arrow-right"></i></a>
+    <h1>المدير</h1>
+    <div style="width:24px;"></div>
+  </div>
+  <div class="stats-row">
+    <div class="stat-card"><h3 id="totalShops">0</h3><p>🏬 محلات</p></div>
+    <div class="stat-card"><h3 id="totalSections">0</h3><p>📂 أقسام</p></div>
+    <div class="stat-card"><h3 id="totalProducts">0</h3><p>📦 منتجات</p></div>
+    <div class="stat-card"><h3 id="totalOffers">0</h3><p>🏷️ عروض</p></div>
+    <div class="stat-card"><h3 id="totalEvents">0</h3><p>📅 فعاليات</p></div>
+  </div>
+
+  <div class="main-card">
+    <div class="card-header"><i class="fas fa-building"></i> لوحة التحكم</div>
+    <div class="card-body">
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="sections">📂 الأقسام</button>
+        <button class="tab-btn" data-tab="shops">🏬 المحلات</button>
+        <button class="tab-btn" data-tab="products">📦 المنتجات</button>
+        <button class="tab-btn" data-tab="offers-events">🏷️ الأنشطة</button>
+      </div>
+
+      <!-- تبويب الأقسام -->
+      <div id="tab-sections" class="tab-pane active">
+        <div id="sectionsList"></div>
+        
+        <div style="margin-top: 15px;">
+            <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+                <input type="text" id="newSectionName" placeholder="اسم القسم" style="flex: 2; padding: 12px; border-radius: 40px; border: 1px solid #e0d0b0;">
+                <select id="newSectionIconSelect" style="flex: 1; padding: 12px; border-radius: 40px; border: 1px solid #e0d0b0; font-family: 'Cairo';">
+                    <option value="fa-tshirt">👕 ألبسة</option>
+                    <option value="fa-mask">💄 مكياج</option>
+                    <option value="fa-mobile-alt">📱 إلكترونيات</option>
+                    <option value="fa-utensils">🍽️ مطاعم</option>
+                    <option value="fa-cut">💇 صالونات</option>
+                    <option value="fa-tablets">💊 صيدلية</option>
+                    <option value="fa-store">🏬 متجر عام</option>
+                    <option value="fa-shoe-prints">👞 أحذية</option>
+                    <option value="fa-clock">⌚ ساعات</option>
+                    <option value="fa-gem">💎 مجوهرات</option>
+                    <option value="custom">✏️ أيقونة مخصصة</option>
+                </select>
+            </div>
+            <div id="customIconWrapper" style="display: none; margin-bottom: 10px;">
+                <input type="text" id="newSectionIconCustom" placeholder="اسم الأيقونة (مثال: fa-camera)" style="width: 100%; padding: 12px; border-radius: 40px; border: 1px solid #e0d0b0;">
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <button class="action-btn" id="addSectionBtn" style="width: auto; padding: 0 20px;"><i class="fas fa-plus"></i> إضافة القسم</button>
+                <div id="iconPreview" style="font-size: 24px; color: #d4af37;"><i class="fas fa-tshirt"></i></div>
+            </div>
+        </div>
+      </div>
+
+      <!-- تبويب المحلات -->
+      <div id="tab-shops" class="tab-pane">
+        <div class="filter-row">
+          <select id="shopSectionFilter" class="filter-select"><option value="">جميع الأقسام</option></select>
+        </div>
+        <div id="shopsList"></div>
+        <button class="add-btn" id="showAddShopModalBtn"><i class="fas fa-plus-circle"></i> إضافة محل</button>
+      </div>
+
+      <!-- تبويب المنتجات -->
+      <div id="tab-products" class="tab-pane">
+        <div class="filter-row">
+          <select id="productFilterShop" class="filter-select"><option value="">كل المحلات</option></select>
+        </div>
+        <div id="allProductsList"></div>
+      </div>
+
+      <!-- تبويب العروض والفعاليات -->
+      <div id="tab-offers-events" class="tab-pane">
+        <div class="filter-row">
+          <select id="offersEventsFilter" class="filter-select">
+            <option value="all">الكل</option>
+            <option value="offers">العروض فقط</option>
+            <option value="events">الفعاليات فقط</option>
+          </select>
+        </div>
+        
+        <div id="offersEventsList"></div>
+        
+        <div style="display: flex; gap: 10px; margin-top: 16px;">
+          <button class="add-btn" id="addOfferBtn" style="margin-top: 0;"><i class="fas fa-tag"></i> إضافة عرض</button>
+          <button class="add-btn" id="addEventBtn" style="margin-top: 0; background: #e67e22;"><i class="fas fa-calendar-alt"></i> إضافة فعالية</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- نافذة محل (تم تعديلها لدعم رفع الصور من الجهاز) -->
+<div id="shopModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header"><h3 id="shopModalTitle">إضافة محل</h3><span class="close-modal" onclick="closeModal('shopModal')">&times;</span></div>
+    <div class="form-group"><label>معرف المحل</label><input id="modalShopId" placeholder="مثال: shop1"></div>
+    <div class="form-group"><label>اسم المحل</label><input id="modalShopName"></div>
+    <div class="form-group"><label>الطابق</label><input id="modalShopFloor"></div>
+    <div class="form-group"><label>الهاتف</label><input id="modalShopPhone"></div>
+    <div class="form-group"><label>القسم</label><select id="modalShopSection"></select></div>
+    <div class="form-group"><label>التصنيف</label><select id="modalShopCategory"><option value="all">الكل</option><option value="men">رجالي</option><option value="women">نسائي</option><option value="kids">ولادي</option></select></div>
+    
+    <!-- منطقة رفع الصور (بدلاً من روابط) -->
+    <div class="form-group">
+      <label>صور المحل (صورتان كحد أقصى)</label>
+      <div id="shopImagesPreviewContainer" class="image-preview-container"></div>
+      <div class="upload-actions">
+        <button class="action-btn" id="uploadShopImageBtn" style="width:auto; padding:0 16px;"><i class="fas fa-folder-open"></i> من الجهاز</button>
+        <button class="action-btn" id="captureShopImageBtn" style="width:auto; padding:0 16px;"><i class="fas fa-camera"></i> الكاميرا</button>
+      </div>
+      <div class="limit-note" id="shopImageLimitMsg"></div>
+      <input type="file" id="shopImageInput" accept="image/*" style="display: none;">
+      <input type="file" id="shopCameraInput" accept="image/*" capture="environment" style="display: none;">
+    </div>
+    
+    <div class="form-group"><label><input type="checkbox" id="modalShopHasOffer"> عرض نشط</label></div>
+    <button class="add-btn" id="saveShopBtn">حفظ</button>
+  </div>
+</div>
+
+<!-- باقي النوافذ دون تغيير -->
+<!-- نافذة تعديل قسم -->
+<div id="sectionModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header"><h3>تعديل القسم</h3><span class="close-modal" onclick="closeModal('sectionModal')">&times;</span></div>
+    <div class="form-group"><label>اسم القسم</label><input id="modalSectionName"></div>
+    <div class="form-group">
+        <label>الأيقونة</label>
+        <select id="modalSectionIconSelect" style="width:100%; padding:14px 16px; border-radius:24px; border:1px solid #e0d6c0; font-family:'Cairo';">
+            <option value="fa-tshirt">👕 ألبسة</option>
+            <option value="fa-mask">💄 مكياج</option>
+            <option value="fa-mobile-alt">📱 إلكترونيات</option>
+            <option value="fa-utensils">🍽️ مطاعم</option>
+            <option value="fa-cut">💇 صالونات</option>
+            <option value="fa-tablets">💊 صيدلية</option>
+            <option value="fa-store">🏬 متجر عام</option>
+            <option value="fa-shoe-prints">👞 أحذية</option>
+            <option value="fa-clock">⌚ ساعات</option>
+            <option value="fa-gem">💎 مجوهرات</option>
+            <option value="custom">✏️ أيقونة مخصصة</option>
+        </select>
+    </div>
+    <div id="modalCustomIconWrapper" style="display:none; margin-top:10px;">
+        <input type="text" id="modalSectionIconCustom" placeholder="اسم الأيقونة (مثال: fa-camera)" style="width:100%; padding:14px 16px; border-radius:24px; border:1px solid #e0d6c0;">
+    </div>
+    <div style="margin-top:10px; font-size:20px; color:#d4af37;" id="modalIconPreview"><i class="fas fa-tshirt"></i></div>
+    <input type="hidden" id="modalSectionIconFinal">
+    <input type="hidden" id="modalSectionIndex">
+    <button class="add-btn" id="saveSectionBtn">حفظ</button>
+  </div>
+</div>
+
+<!-- نافذة عرض -->
+<div id="offerModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header"><h3 id="offerModalTitle">إضافة عرض</h3><span class="close-modal" onclick="closeModal('offerModal')">&times;</span></div>
+    <div class="form-group"><label>المحل</label><select id="modalOfferShop"></select></div>
+    <div class="form-group"><label>العنوان</label><input id="modalOfferTitle"></div>
+    <div class="form-group"><label>الوصف</label><input id="modalOfferDesc"></div>
+    <div class="form-group"><label>الشارة</label><input id="modalOfferBadge" value="عرض المدير"></div>
+    <div class="form-group"><label>أيقونة الشارة</label><input id="modalOfferBadgeIcon" value="fa-crown"></div>
+    <input type="hidden" id="modalOfferIndex">
+    <button class="add-btn" id="saveOfferBtn">حفظ</button>
+  </div>
+</div>
+
+<!-- نافذة فعالية -->
+<div id="eventModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header"><h3 id="eventModalTitle">إضافة فعالية</h3><span class="close-modal" onclick="closeModal('eventModal')">&times;</span></div>
+    <div class="form-group"><label>العنوان</label><input id="modalEventTitle"></div>
+    <div class="form-group"><label>التاريخ</label><input id="modalEventDate" placeholder="مثال: 2 مايو"></div>
+    <div class="form-group"><label>وصف (اختياري)</label><input id="modalEventDesc" placeholder="تفاصيل الفعالية"></div>
+    <input type="hidden" id="modalEventIndex">
+    <button class="add-btn" id="saveEventBtn">حفظ</button>
+  </div>
+</div>
+
+<!-- نافذة منتج -->
+<div id="productModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header"><h3>تعديل المنتج</h3><span class="close-modal" onclick="closeModal('productModal')">&times;</span></div>
+    <div class="form-group"><label>الاسم</label><input id="modalProdName"></div>
+    <div class="form-group"><label>السعر ($)</label><input id="modalProdPrice" type="number"></div>
+    <div class="form-group"><label>أيقونة</label><input id="modalProdIcon"></div>
+    <div class="form-group"><label>وصف</label><textarea id="modalProdDesc"></textarea></div>
+    <div class="form-group"><label>صور</label><textarea id="modalProdImages" rows="2"></textarea></div>
+    <div class="form-group"><label>ألوان</label><input id="modalProdColors"></div>
+    <div class="form-group"><label>مقاسات</label><input id="modalProdSizes"></div>
+    <div class="form-group"><label><input type="checkbox" id="modalProdHasOffer"> عليه عرض</label></div>
+    <div class="form-group"><label><input type="checkbox" id="modalProdActive" checked> نشط</label></div>
+    <input type="hidden" id="modalProdShopId"><input type="hidden" id="modalProdIndex">
+    <button class="add-btn" id="saveProductBtn">حفظ</button>
+  </div>
+</div>
+
+<div id="toast" class="toast-notification"></div>
+
+<script>
+  (async function(){
+    let sections = [], shops = [], offers = [], products = {}, events = [];
+    let shopTempImages = []; // لتخزين صور المحل مؤقتاً (Base64)
+    const MAX_SHOP_IMAGES = 2;
+
+    async function loadData() {
+      try {
+        // جلب الأقسام
+        const sectionsSnapshot = await getDocs(collection(db, 'sections'));
+        sections = sectionsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+        // جلب المحلات
+        const shopsSnapshot = await getDocs(collection(db, 'shops'));
+        shops = shopsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+        // جلب العروض
+        const offersSnapshot = await getDocs(collection(db, 'offers'));
+        offers = offersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+        // جلب المنتجات
+        const productsSnapshot = await getDocs(collection(db, 'products'));
+        products = {};
+        productsSnapshot.docs.forEach(doc => {
+          const data = doc.data();
+          if (!products[data.shopId]) products[data.shopId] = [];
+          products[data.shopId].push({ id: doc.id, ...data });
+        });
+
+        // جلب الأحداث
+        const eventsSnapshot = await getDocs(collection(db, 'events'));
+        events = eventsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+        updateStats();
+        renderAll();
+      } catch (error) {
+        console.error('خطأ في تحميل البيانات:', error);
+        showToast('خطأ في تحميل البيانات', 'error');
+      }
+    }
+
+    async function saveAll() {
+      // حفظ الأقسام
+      for (const section of sections) {
+        await setDoc(doc(db, 'sections', section.id), { name: section.name, icon: section.icon });
+      }
+
+      // حفظ المحلات
+      for (const shop of shops) {
+        await setDoc(doc(db, 'shops', shop.id), {
+          name: shop.name, floor: shop.floor, phone: shop.phone, sectionId: shop.sectionId, category: shop.category, images: shop.images || []
+        });
+      }
+
+      // حفظ العروض
+      for (const offer of offers) {
+        await setDoc(doc(db, 'offers', offer.id || `offer_${Date.now()}`), {
+          title: offer.title, description: offer.description, badge: offer.badge, shopName: offer.shopName, type: offer.type
+        });
+      }
+
+      // حفظ المنتجات
+      for (const shopId in products) {
+        for (const product of products[shopId]) {
+          await setDoc(doc(db, 'products', product.id || `product_${Date.now()}_${Math.random()}`), {
+            shopId: shopId, name: product.name, price: product.price, icon: product.icon, description: product.description,
+            images: product.images || [], colors: product.colors || [], sizes: product.sizes || [], active: product.active, hasOffer: product.hasOffer
+          });
+        }
+      }
+
+      // حفظ الأحداث
+      for (const event of events) {
+        await setDoc(doc(db, 'events', event.id || `event_${Date.now()}`), {
+          title: event.title, description: event.description, date: event.date, type: event.type
+        });
+      }
+    }
+
+    function countTotalProducts() { return Object.values(products).reduce((sum, arr) => sum + arr.length, 0); }
+    function updateStats() {
+      document.getElementById('totalShops').innerText = shops.length;
+      document.getElementById('totalSections').innerText = sections.length;
+      document.getElementById('totalProducts').innerText = countTotalProducts();
+      document.getElementById('totalOffers').innerText = offers.length;
+      document.getElementById('totalEvents').innerText = events.length;
+    }
+
+    function renderAll() { 
+      renderSections(); 
+      renderShops(); 
+      renderOffersEvents(); 
+      renderAllProducts(); 
+      populateSelects(); 
+      updateStats(); 
+    }
+
+    // ========== الأقسام (بدون تغيير) ==========
+    function renderSections() {
+      const c = document.getElementById('sectionsList'); c.innerHTML = '';
+      if (sections.length === 0) {
+        c.innerHTML = '<div class="list-item" style="justify-content:center;">لا توجد أقسام. أضف قسماً جديداً.</div>';
+        return;
+      }
+      sections.forEach((s, i) => {
+        const d = document.createElement('div'); d.className = 'list-item';
+        d.innerHTML = `<div class="item-info"><div class="item-icon"><i class="fas ${s.icon}"></i></div><div class="item-details"><h4>${s.name}</h4><p>${s.id}</p></div></div>
+          <div class="item-actions"><button class="action-btn edit-section" data-idx="${i}"><i class="fas fa-edit"></i></button>
+          <button class="action-btn danger-btn delete-section" data-idx="${i}"><i class="fas fa-trash"></i></button></div>`;
+        c.appendChild(d);
+      });
+      document.querySelectorAll('.edit-section').forEach(b => b.onclick = () => openSectionModal(b.dataset.idx));
+      document.querySelectorAll('.delete-section').forEach(b => b.onclick = () => {
+        if(confirm('حذف القسم وجميع محلاته ومنتجاتها وعروضها؟')) {
+          const secId = sections[b.dataset.idx].id;
+          const shopsToDelete = shops.filter(s => s.sectionId === secId);
+          const shopNames = shopsToDelete.map(s => s.name);
+          
+          shops = shops.filter(s => s.sectionId !== secId);
+          shopsToDelete.forEach(s => { delete products[s.id]; });
+          offers = offers.filter(o => !shopNames.includes(o.shopName));
+          
+          sections.splice(b.dataset.idx,1);
+          saveAll(); renderAll(); showToast('تم الحذف');
+        }
+      });
+    }
+
+    // معاينة الأيقونة (بدون تغيير)
+    const iconSelect = document.getElementById('newSectionIconSelect');
+    const customWrapper = document.getElementById('customIconWrapper');
+    const customInput = document.getElementById('newSectionIconCustom');
+    const iconPreview = document.getElementById('iconPreview');
+
+    iconSelect.addEventListener('change', function() {
+        const val = this.value;
+        if (val === 'custom') {
+            customWrapper.style.display = 'block';
+            updatePreview(customInput.value || 'fa-star');
+        } else {
+            customWrapper.style.display = 'none';
+            updatePreview(val);
+        }
+    });
+    customInput.addEventListener('input', function() {
+        if (iconSelect.value === 'custom') updatePreview(this.value || 'fa-star');
+    });
+    function updatePreview(iconClass) {
+        iconPreview.innerHTML = `<i class="fas ${iconClass}"></i>`;
+    }
+
+    const modalIconSelect = document.getElementById('modalSectionIconSelect');
+    const modalCustomWrapper = document.getElementById('modalCustomIconWrapper');
+    const modalCustomInput = document.getElementById('modalSectionIconCustom');
+    const modalIconPreview = document.getElementById('modalIconPreview');
+    const modalIconFinal = document.getElementById('modalSectionIconFinal');
+
+    modalIconSelect.addEventListener('change', function() {
+        const val = this.value;
+        if (val === 'custom') {
+            modalCustomWrapper.style.display = 'block';
+            updateModalPreview(modalCustomInput.value || 'fa-star');
+            modalIconFinal.value = modalCustomInput.value || 'fa-star';
+        } else {
+            modalCustomWrapper.style.display = 'none';
+            updateModalPreview(val);
+            modalIconFinal.value = val;
+        }
+    });
+    modalCustomInput.addEventListener('input', function() {
+        updateModalPreview(this.value || 'fa-star');
+        modalIconFinal.value = this.value;
+    });
+    function updateModalPreview(iconClass) {
+        modalIconPreview.innerHTML = `<i class="fas ${iconClass}"></i>`;
+    }
+
+    function openSectionModal(idx) {
+        const sec = sections[idx];
+        document.getElementById('modalSectionName').value = sec.name;
+        const commonIcons = ['fa-tshirt', 'fa-mask', 'fa-mobile-alt', 'fa-utensils', 'fa-cut', 'fa-tablets', 'fa-store', 'fa-shoe-prints', 'fa-clock', 'fa-gem'];
+        if (commonIcons.includes(sec.icon)) {
+            modalIconSelect.value = sec.icon;
+            modalCustomWrapper.style.display = 'none';
+            modalIconFinal.value = sec.icon;
+            updateModalPreview(sec.icon);
+        } else {
+            modalIconSelect.value = 'custom';
+            modalCustomWrapper.style.display = 'block';
+            modalCustomInput.value = sec.icon;
+            modalIconFinal.value = sec.icon;
+            updateModalPreview(sec.icon);
+        }
+        document.getElementById('modalSectionIndex').value = idx;
+        document.getElementById('sectionModal').style.display = 'flex';
+    }
+
+    // ========== المحلات (مع تعديلات رفع الصور) ==========
+    function renderShops() {
+      const filter = document.getElementById('shopSectionFilter').value;
+      const c = document.getElementById('shopsList'); c.innerHTML = '';
+      const filtered = filter ? shops.filter(s => s.sectionId === filter) : shops;
+      if (filtered.length === 0) {
+        c.innerHTML = '<div class="list-item" style="justify-content:center;">لا توجد محلات في هذا القسم.</div>';
+        return;
+      }
+      filtered.forEach(s => {
+        const sec = sections.find(x => x.id === s.sectionId)?.name || 'بدون قسم';
+        const d = document.createElement('div'); d.className = 'list-item';
+        const imgSrc = (s.images && s.images.length > 0) ? s.images[0] : 'https://placehold.co/100';
+        d.innerHTML = `<div class="item-info"><img class="shop-thumb" src="${imgSrc}"><div class="item-details"><h4>${s.name}</h4><p>${sec} · ${s.floor}</p></div></div>
+          <div class="item-actions"><button class="action-btn edit-shop" data-id="${s.id}"><i class="fas fa-edit"></i></button>
+          <button class="action-btn danger-btn delete-shop" data-id="${s.id}"><i class="fas fa-trash"></i></button></div>`;
+        c.appendChild(d);
+      });
+      document.querySelectorAll('.edit-shop').forEach(b => b.onclick = () => openShopModal(shops.findIndex(s => s.id === b.dataset.id)));
+      document.querySelectorAll('.delete-shop').forEach(b => b.onclick = () => {
+        if(confirm('حذف المحل ومنتجاته وعروضه؟')) {
+          const shop = shops.find(s => s.id === b.dataset.id);
+          const id = b.dataset.id;
+          delete products[id];
+          offers = offers.filter(o => o.shopName !== shop.name);
+          shops = shops.filter(s => s.id !== id);
+          saveAll(); renderAll(); showToast('تم الحذف');
+        }
+      });
+    }
+
+    function openShopModal(idx = null) {
+      populateSelects();
+      shopTempImages = []; // إعادة تعيين الصور المؤقتة
+      if(idx !== null) {
+        const s = shops[idx];
+        document.getElementById('shopModalTitle').innerText = 'تعديل المحل';
+        document.getElementById('modalShopId').value = s.id; document.getElementById('modalShopId').disabled = true;
+        document.getElementById('modalShopName').value = s.name;
+        document.getElementById('modalShopFloor').value = s.floor;
+        document.getElementById('modalShopPhone').value = s.phone || '';
+        document.getElementById('modalShopSection').value = s.sectionId;
+        document.getElementById('modalShopCategory').value = s.category || 'all';
+        document.getElementById('modalShopHasOffer').checked = s.hasOffer || false;
+        shopTempImages = s.images || [];
+        document.getElementById('saveShopBtn').dataset.editIdx = idx;
+        renderShopImagePreview();
+      } else {
+        document.getElementById('shopModalTitle').innerText = 'إضافة محل';
+        document.getElementById('modalShopId').disabled = false; document.getElementById('modalShopId').value = '';
+        document.getElementById('modalShopName').value = ''; document.getElementById('modalShopFloor').value = '';
+        document.getElementById('modalShopPhone').value = ''; 
+        document.getElementById('modalShopHasOffer').checked = false;
+        delete document.getElementById('saveShopBtn').dataset.editIdx;
+        renderShopImagePreview();
+      }
+      document.getElementById('shopModal').style.display = 'flex';
+    }
+
+    // دوال معاينة صور المحل
+    function renderShopImagePreview() {
+      const container = document.getElementById('shopImagesPreviewContainer');
+      const limitMsg = document.getElementById('shopImageLimitMsg');
+      if (!shopTempImages.length) {
+        container.innerHTML = `<div style="width:100%; text-align:center; padding:16px; color:#888; background:#fefcf5; border-radius:28px; border:1px dashed #ccc;"><i class="fas fa-cloud-upload-alt" style="font-size:28px; opacity:0.5;"></i><p>لم يتم رفع صور بعد</p></div>`;
+      } else {
+        container.innerHTML = shopTempImages.map((img, i) => `
+          <div class="preview-img-wrapper">
+            <img src="${img}" class="image-preview">
+            <span class="remove-img" data-index="${i}">&times;</span>
+          </div>
+        `).join('');
+        document.querySelectorAll('.remove-img').forEach(btn => btn.onclick = (e) => {
+          const idx = e.target.dataset.index;
+          shopTempImages.splice(idx, 1);
+          renderShopImagePreview();
+        });
+      }
+      const remaining = MAX_SHOP_IMAGES - shopTempImages.length;
+      limitMsg.innerHTML = remaining ? `يمكنك إضافة ${remaining} ${remaining === 2 ? 'صورتين' : 'صورة'} إضافية` : '✅ تم الوصول للحد الأقصى (صورتان)';
+    }
+
+    function handleShopImageFile(file) {
+      if (shopTempImages.length >= MAX_SHOP_IMAGES) { showToast('يمكنك رفع صورتين فقط'); return; }
+      const reader = new FileReader();
+      reader.onload = e => { shopTempImages.push(e.target.result); renderShopImagePreview(); };
+      reader.readAsDataURL(file);
+    }
+
+    // ربط أزرار رفع صور المحل
+    document.getElementById('uploadShopImageBtn').addEventListener('click', () => document.getElementById('shopImageInput').click());
+    document.getElementById('captureShopImageBtn').addEventListener('click', () => document.getElementById('shopCameraInput').click());
+    document.getElementById('shopImageInput').addEventListener('change', e => { if(e.target.files[0]) { handleShopImageFile(e.target.files[0]); e.target.value = ''; } });
+    document.getElementById('shopCameraInput').addEventListener('change', e => { if(e.target.files[0]) { handleShopImageFile(e.target.files[0]); e.target.value = ''; } });
+
+    // حفظ المحل (تعديل لاستخدام shopTempImages)
+    document.getElementById('saveShopBtn').onclick = () => {
+      const id = document.getElementById('modalShopId').value.trim();
+      const name = document.getElementById('modalShopName').value.trim();
+      const floor = document.getElementById('modalShopFloor').value.trim();
+      if(!id||!name||!floor) return showToast('الحقول الأساسية مطلوبة');
+      const editIdx = document.getElementById('saveShopBtn').dataset.editIdx;
+      const data = {
+        id, name, floor,
+        phone: document.getElementById('modalShopPhone').value,
+        sectionId: document.getElementById('modalShopSection').value,
+        category: document.getElementById('modalShopCategory').value,
+        images: shopTempImages, // استخدام الصور المرفوعة Base64
+        hasOffer: document.getElementById('modalShopHasOffer').checked
+      };
+      if(editIdx !== undefined) shops[editIdx] = data;
+      else { if(shops.find(s=>s.id===id)) return showToast('المعرف موجود'); shops.push(data); }
+      saveAll(); renderAll(); closeModal('shopModal'); showToast('تم الحفظ');
+    };
+
+    // ========== المنتجات (بدون تغيير) ==========
+    function renderAllProducts() {
+      const filter = document.getElementById('productFilterShop').value;
+      const c = document.getElementById('allProductsList'); c.innerHTML = '';
+      let hasProducts = false;
+      for(const id in products) {
+        if(filter && id !== filter) continue;
+        const shop = shops.find(s=>s.id===id) || { name: id };
+        products[id].forEach((p, i) => {
+          hasProducts = true;
+          const d = document.createElement('div'); d.className = 'list-item';
+          d.innerHTML = `<div class="item-info"><div class="item-icon"><i class="fas ${p.icon}"></i></div><div class="item-details"><h4>${p.name}</h4><p>${p.price}$ · ${shop.name}</p></div></div>
+            <div class="item-actions"><button class="action-btn edit-product" data-shop="${id}" data-idx="${i}"><i class="fas fa-edit"></i></button>
+            <button class="action-btn danger-btn delete-product" data-shop="${id}" data-idx="${i}"><i class="fas fa-trash"></i></button></div>`;
+          c.appendChild(d);
+        });
+      }
+      if (!hasProducts) c.innerHTML = '<div class="list-item" style="justify-content:center;">لا توجد منتجات.</div>';
+      document.querySelectorAll('.edit-product').forEach(b => b.onclick = () => openProductModal(b.dataset.shop, b.dataset.idx));
+      document.querySelectorAll('.delete-product').forEach(b => b.onclick = () => {
+        if(confirm('حذف المنتج؟')) {
+          products[b.dataset.shop].splice(b.dataset.idx,1);
+          if(products[b.dataset.shop].length===0) delete products[b.dataset.shop];
+          saveAll(); renderAll(); showToast('تم الحذف');
+        }
+      });
+    }
+
+    function openProductModal(shopId, idx) {
+      const p = products[shopId][idx];
+      document.getElementById('modalProdName').value = p.name;
+      document.getElementById('modalProdPrice').value = p.price;
+      document.getElementById('modalProdIcon').value = p.icon || '';
+      document.getElementById('modalProdDesc').value = p.longDesc || '';
+      document.getElementById('modalProdImages').value = (p.images||[]).join('\n');
+      document.getElementById('modalProdColors').value = (p.colors||[]).join(',');
+      document.getElementById('modalProdSizes').value = (p.sizes||[]).join(',');
+      document.getElementById('modalProdHasOffer').checked = p.hasOffer || false;
+      document.getElementById('modalProdActive').checked = p.active !== false;
+      document.getElementById('modalProdShopId').value = shopId;
+      document.getElementById('modalProdIndex').value = idx;
+      document.getElementById('productModal').style.display = 'flex';
+    }
+
+    // ========== العروض والفعاليات (بدون تغيير) ==========
+    function renderOffersEvents() {
+      const filter = document.getElementById('offersEventsFilter').value;
+      const c = document.getElementById('offersEventsList');
+      c.innerHTML = '';
+      
+      let items = [];
+      
+      if (filter === 'all' || filter === 'offers') {
+        offers.forEach((o, i) => {
+          items.push({
+            type: 'offer',
+            data: o,
+            originalIndex: i,
+            icon: o.icon || 'fa-gift',
+            title: o.title,
+            subtitle: o.shopName,
+            desc: o.desc
+          });
+        });
+      }
+      
+      if (filter === 'all' || filter === 'events') {
+        events.forEach((e, i) => {
+          items.push({
+            type: 'event',
+            data: e,
+            originalIndex: i,
+            icon: 'fa-calendar-alt',
+            title: e.title,
+            subtitle: e.date,
+            desc: e.desc || ''
+          });
+        });
+      }
+      
+      if (items.length === 0) {
+        c.innerHTML = '<div class="list-item" style="justify-content:center;">لا توجد عناصر.</div>';
+        return;
+      }
+      
+      items.forEach(item => {
+        const d = document.createElement('div'); d.className = 'list-item';
+        const badge = item.type === 'offer' ? '🏷️ عرض' : '📅 فعالية';
+        d.innerHTML = `
+          <div class="item-info">
+            <div class="item-icon"><i class="fas ${item.icon}"></i></div>
+            <div class="item-details">
+              <h4>${item.title} <span style="font-size:0.7rem; background:#e9ecef; padding:2px 8px; border-radius:20px;">${badge}</span></h4>
+              <p>${item.subtitle}</p>
+              ${item.desc ? `<p style="color:#6c757d;">${item.desc}</p>` : ''}
+            </div>
+          </div>
+          <div class="item-actions">
+            <button class="action-btn edit-item" data-type="${item.type}" data-idx="${item.originalIndex}"><i class="fas fa-edit"></i></button>
+            <button class="action-btn danger-btn delete-item" data-type="${item.type}" data-idx="${item.originalIndex}"><i class="fas fa-trash"></i></button>
+          </div>
+        `;
+        c.appendChild(d);
+      });
+      
+      document.querySelectorAll('.edit-item').forEach(b => {
+        b.onclick = () => {
+          const type = b.dataset.type;
+          const idx = parseInt(b.dataset.idx);
+          if (type === 'offer') openOfferModal(idx);
+          else openEventModal(idx);
+        };
+      });
+      
+      document.querySelectorAll('.delete-item').forEach(b => {
+        b.onclick = () => {
+          const type = b.dataset.type;
+          const idx = parseInt(b.dataset.idx);
+          if (type === 'offer') {
+            if(confirm('حذف العرض؟')) {
+              offers.splice(idx, 1);
+              saveAll(); renderOffersEvents(); updateStats(); showToast('تم الحذف');
+            }
+          } else {
+            if(confirm('حذف الفعالية؟')) {
+              events.splice(idx, 1);
+              saveAll(); renderOffersEvents(); updateStats(); showToast('تم الحذف');
+            }
+          }
+        };
+      });
+    }
+
+    function openOfferModal(idx = null) {
+      populateSelects();
+      if(idx !== null) {
+        const o = offers[idx];
+        document.getElementById('offerModalTitle').innerText = 'تعديل عرض';
+        document.getElementById('modalOfferShop').value = o.shopName;
+        document.getElementById('modalOfferTitle').value = o.title;
+        document.getElementById('modalOfferDesc').value = o.desc;
+        document.getElementById('modalOfferBadge').value = o.badge || '';
+        document.getElementById('modalOfferBadgeIcon').value = o.badgeIcon || '';
+        document.getElementById('modalOfferIndex').value = idx;
+      } else {
+        document.getElementById('offerModalTitle').innerText = 'إضافة عرض';
+        document.getElementById('modalOfferShop').value = '';
+        document.getElementById('modalOfferTitle').value = '';
+        document.getElementById('modalOfferDesc').value = '';
+        document.getElementById('modalOfferBadge').value = 'عرض المدير';
+        document.getElementById('modalOfferBadgeIcon').value = 'fa-crown';
+        document.getElementById('modalOfferIndex').value = '';
+      }
+      document.getElementById('offerModal').style.display = 'flex';
+    }
+
+    function openEventModal(idx = null) {
+      if(idx !== null) {
+        const e = events[idx];
+        document.getElementById('eventModalTitle').innerText = 'تعديل فعالية';
+        document.getElementById('modalEventTitle').value = e.title;
+        document.getElementById('modalEventDate').value = e.date;
+        document.getElementById('modalEventDesc').value = e.desc || '';
+        document.getElementById('modalEventIndex').value = idx;
+      } else {
+        document.getElementById('eventModalTitle').innerText = 'إضافة فعالية';
+        document.getElementById('modalEventTitle').value = '';
+        document.getElementById('modalEventDate').value = '';
+        document.getElementById('modalEventDesc').value = '';
+        document.getElementById('modalEventIndex').value = '';
+      }
+      document.getElementById('eventModal').style.display = 'flex';
+    }
+
+    function populateSelects() {
+      const secSel = document.getElementById('modalShopSection'); secSel.innerHTML = '<option value="">اختر القسم</option>';
+      sections.forEach(s => secSel.add(new Option(s.name, s.id)));
+      const offSel = document.getElementById('modalOfferShop'); offSel.innerHTML = '<option value="">اختر المحل</option>';
+      shops.forEach(s => offSel.add(new Option(s.name, s.name)));
+      const prodFilter = document.getElementById('productFilterShop'); prodFilter.innerHTML = '<option value="">كل المحلات</option>';
+      shops.forEach(s => prodFilter.add(new Option(s.name, s.id)));
+      const shopFilter = document.getElementById('shopSectionFilter'); shopFilter.innerHTML = '<option value="">جميع الأقسام</option>';
+      sections.forEach(s => shopFilter.add(new Option(s.name, s.id)));
+    }
+
+    function showToast(m) {
+      const t = document.getElementById('toast'); t.innerText = m; t.style.display = 'block';
+      setTimeout(() => t.style.display = 'none', 2500);
+    }
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+    // ========== مستمعات الأحداث (مع تعديلات طفيفة) ==========
+    document.getElementById('addSectionBtn').onclick = () => {
+        const n = document.getElementById('newSectionName').value.trim();
+        let i = iconSelect.value;
+        if (i === 'custom') i = customInput.value.trim() || 'fa-store';
+        if (!n) return showToast('أدخل اسم القسم');
+        const id = n.replace(/\s/g, '_').toLowerCase();
+        if (sections.find(s => s.id === id)) return showToast('المعرف موجود');
+        sections.push({ id, name: n, icon: i });
+        saveAll(); renderAll(); showToast('تمت الإضافة');
+        document.getElementById('newSectionName').value = '';
+        iconSelect.value = 'fa-tshirt';
+        customWrapper.style.display = 'none';
+        customInput.value = '';
+        updatePreview('fa-tshirt');
+    };
+
+    document.getElementById('saveSectionBtn').onclick = () => {
+        const idx = document.getElementById('modalSectionIndex').value;
+        sections[idx].name = document.getElementById('modalSectionName').value;
+        sections[idx].icon = modalIconFinal.value;
+        saveAll(); renderAll(); closeModal('sectionModal'); showToast('تم التحديث');
+    };
+
+    document.getElementById('shopSectionFilter').addEventListener('change', renderShops);
+    document.getElementById('showAddShopModalBtn').onclick = () => openShopModal();
+
+    document.getElementById('addOfferBtn').onclick = () => openOfferModal();
+    document.getElementById('saveOfferBtn').onclick = () => {
+      const shop = document.getElementById('modalOfferShop').value;
+      const title = document.getElementById('modalOfferTitle').value;
+      if(!shop||!title) return showToast('اختر محلاً وعنواناً');
+      const offer = {
+        shopName: shop, title,
+        desc: document.getElementById('modalOfferDesc').value,
+        icon: 'fa-gift',
+        badge: document.getElementById('modalOfferBadge').value,
+        badgeIcon: document.getElementById('modalOfferBadgeIcon').value
+      };
+      const idx = document.getElementById('modalOfferIndex').value;
+      if(idx) offers[idx] = offer; else offers.push(offer);
+      saveAll(); renderOffersEvents(); updateStats(); closeModal('offerModal'); showToast('تم الحفظ');
+    };
+
+    document.getElementById('addEventBtn').onclick = () => openEventModal();
+    document.getElementById('saveEventBtn').onclick = () => {
+      const title = document.getElementById('modalEventTitle').value;
+      const date = document.getElementById('modalEventDate').value;
+      if(!title || !date) return showToast('العنوان والتاريخ مطلوبان');
+      const event = {
+        title, date,
+        desc: document.getElementById('modalEventDesc').value
+      };
+      const idx = document.getElementById('modalEventIndex').value;
+      if(idx) events[idx] = event; else events.push(event);
+      saveAll(); renderOffersEvents(); updateStats(); closeModal('eventModal'); showToast('تم الحفظ');
+    };
+
+    document.getElementById('saveProductBtn').onclick = () => {
+      const shop = document.getElementById('modalProdShopId').value;
+      const idx = document.getElementById('modalProdIndex').value;
+      const prod = {
+        name: document.getElementById('modalProdName').value,
+        price: parseFloat(document.getElementById('modalProdPrice').value),
+        icon: document.getElementById('modalProdIcon').value,
+        longDesc: document.getElementById('modalProdDesc').value,
+        images: document.getElementById('modalProdImages').value.split('\n').filter(l=>l.trim()),
+        colors: document.getElementById('modalProdColors').value.split(',').map(c=>c.trim()).filter(c=>c),
+        sizes: document.getElementById('modalProdSizes').value.split(',').map(s=>s.trim()).filter(s=>s),
+        hasOffer: document.getElementById('modalProdHasOffer').checked,
+        active: document.getElementById('modalProdActive').checked
+      };
+      if(!products[shop]) products[shop] = [];
+      if(idx) products[shop][idx] = prod; else products[shop].push(prod);
+      saveAll(); renderAll(); closeModal('productModal'); showToast('تم الحفظ');
+    };
+
+    document.getElementById('productFilterShop').addEventListener('change', renderAllProducts);
+    document.getElementById('offersEventsFilter').addEventListener('change', renderOffersEvents);
+
+    document.querySelectorAll('.tab-btn').forEach(b => b.addEventListener('click', ()=>{
+      document.querySelectorAll('.tab-btn').forEach(x=>x.classList.remove('active'));
+      document.querySelectorAll('.tab-pane').forEach(x=>x.classList.remove('active'));
+      b.classList.add('active');
+      document.getElementById(`tab-${b.dataset.tab}`).classList.add('active');
+    }));
+
+    window.addEventListener('click', (e) => { if(e.target.classList.contains('modal')) e.target.style.display = 'none'; });
+    await loadData();
+  })();
+</script>
+</body>
+</html>

@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+  <title>صاحب المحل | مول الطبقة</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <script type="module">
+      // Firebase imports
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+      import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+      // Firebase config (replace with your actual config)
+      const firebaseConfig = {
+    apiKey: "AIzaSyDp9VNr_SS9LOIZxjgogXbG7KQRoxaUJ_E",
+    authDomain: "mol-altapqa.firebaseapp.com",
+    projectId: "mol-altapqa",
+    storageBucket: "mol-altapqa.firebasestorage.app",
+    messagingSenderId: "8649488671",
+    appId: "1:8649488671:web:b1748ccf29851889e2182a",
+    measurementId: "G-1JWPLVKGPP"
+  };
+
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      const db = getFirestore(app);
+
+      // Make db available globally
+      window.db = db;
+      window.collection = collection;
+      window.addDoc = addDoc;
+      window.getDocs = getDocs;
+      window.doc = doc;
+      window.updateDoc = updateDoc;
+      window.deleteDoc = deleteDoc;
+  </script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Cairo', sans-serif; background: #f5f3ef; direction: rtl; padding: 16px 12px 30px; min-height: 100vh; }
+    .app-container { max-width: 480px; margin: 0 auto; }
+    .top-bar { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+    .back-link { color: #d4af37; text-decoration: none; font-size: 20px; }
+    .top-bar h1 { font-size: 1.5rem; font-weight: 700; color: #1e1e1e; flex: 1; }
+    .shop-selector { background: white; border-radius: 40px; padding: 6px 16px; margin-bottom: 20px; border: 1px solid #f0e0b0; display: flex; align-items: center; gap: 10px; }
+    .shop-selector i { color: #d4af37; }
+    .shop-selector select { flex: 1; padding: 12px 0; border: none; background: transparent; font-family: 'Cairo'; font-weight: 600; }
+    .main-card { background: white; border-radius: 32px; border: 1px solid #f0e0b0; overflow: hidden; }
+    .card-header { background: #d4af37; padding: 18px 20px; color: #1e1e1e; font-weight: 700; }
+    .card-body { padding: 18px 16px; }
+    .stats-mini-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 20px; }
+    .stat-mini-card { background: #fefcf5; border-radius: 18px; padding: 10px 4px; text-align: center; border: 1px solid #f0e0b0; }
+    .stat-mini-card .stat-value { font-size: 1.3rem; font-weight: 700; color: #d4af37; line-height: 1.2; }
+    .stat-mini-card .stat-label { font-size: 0.65rem; color: #5a5a5a; margin-top: 2px; }
+    .tabs { display: flex; gap: 6px; background: #faf7f2; padding: 6px; border-radius: 60px; margin-bottom: 22px; }
+    .tab-btn { flex: 1; background: transparent; border: none; padding: 10px 2px; border-radius: 40px; font-family: 'Cairo'; font-weight: 600; font-size: 0.8rem; color: #4a4a4a; cursor: pointer; white-space: nowrap; }
+    .tab-btn.active { background: #d4af37; color: #1e1e1e; }
+    .tab-pane { display: none; }
+    .tab-pane.active { display: block; }
+    .list-item { background: #fefcf8; border-radius: 24px; padding: 14px 16px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; border: 1px solid #f0e6d2; }
+    .item-info { display: flex; align-items: center; gap: 12px; flex: 1; }
+    .item-icon { width: 48px; height: 48px; background: #f5ede0; border-radius: 20px; display: flex; align-items: center; justify-content: center; color: #d4af37; font-size: 1.4rem; }
+    .item-details { flex: 1; }
+    .item-details h4 { font-weight: 700; font-size: 1rem; margin-bottom: 4px; }
+    .item-details .price { font-weight: 600; color: #2c2c2c; margin-bottom: 6px; }
+    .badge-container { display: flex; flex-wrap: wrap; gap: 6px; }
+    .badge { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 30px; font-size: 0.7rem; font-weight: 600; cursor: pointer; transition: 0.2s; }
+    .badge-active { background: #d4edda; color: #155724; }
+    .badge-inactive { background: #f8d7da; color: #721c24; }
+    .badge-offer { background: #d4af37; color: #1e1e1e; }
+    .badge:hover { opacity: 0.8; transform: scale(0.97); }
+    .item-actions { display: flex; gap: 6px; }
+    .action-btn { background: white; border: 1px solid #eee6d8; width: 36px; height: 36px; border-radius: 50%; color: #5a5a5a; cursor: pointer; }
+    .danger-btn { color: #dc3545; border-color: #ffe3e3; }
+    .add-btn { background: #d4af37; border: none; width: 100%; padding: 14px; border-radius: 40px; font-weight: 700; margin-top: 16px; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; color: #1e1e1e; }
+    .input-group { margin-bottom: 16px; }
+    .input-group label { display: block; margin-bottom: 6px; font-weight: 600; }
+    .input-group input, .input-group textarea, .input-group select { width: 100%; padding: 14px 16px; border-radius: 24px; border: 1px solid #e0d6c0; font-family: 'Cairo'; }
+    .image-preview-row { display: flex; gap: 10px; flex-wrap: wrap; margin: 12px 0; }
+    .preview-img { width: 80px; height: 80px; border-radius: 18px; object-fit: cover; border: 1px solid #e0d0b0; background: #f0e0b0; }
+    .image-upload-area { border: 2px dashed #d4af37; border-radius: 24px; padding: 20px; text-align: center; background: #fefcf5; margin: 15px 0; cursor: pointer; }
+    .image-upload-area i { font-size: 32px; color: #d4af37; margin-bottom: 8px; }
+    .pill-container { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; }
+    .pill { background: #f0e0b0; padding: 6px 12px; border-radius: 40px; font-size: 0.8rem; display: flex; align-items: center; gap: 8px; }
+    .color-picker-row { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+    .color-picker-row input[type="color"] { width: 50px; height: 50px; padding: 0; border-radius: 50%; border: 2px solid #d4af37; }
+    .quick-colors { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+    .quick-color-btn { width: 40px; height: 40px; border-radius: 50%; border: 2px solid #ddd; cursor: pointer; }
+    .quick-sizes { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+    .quick-size-btn { background: #f0e0b0; border: none; padding: 8px 16px; border-radius: 40px; font-weight: 600; cursor: pointer; }
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; align-items: center; justify-content: center; padding: 16px; }
+    .modal-content { background: white; width: 100%; max-width: 450px; border-radius: 32px; padding: 24px 20px; max-height: 90vh; overflow-y: auto; }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .close-modal { font-size: 28px; cursor: pointer; color: #dc3545; line-height: 1; font-weight: bold; }
+    .close-modal:hover { color: #a71d2a; }
+    .toast-notification { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #212529; color: #d4af37; padding: 12px 24px; border-radius: 50px; z-index: 3000; display: none; }
+    .preview-img-wrapper { position: relative; }
+    .preview-img-wrapper .remove-img { position: absolute; top: -6px; left: -6px; background: #dc3545; color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; }
+    .limit-note { font-size: 0.8rem; margin-top: 8px; color: #d4af37; }
+    .upload-actions { display: flex; gap: 10px; margin-top: 10px; }
+    .toggle-group { display: flex; flex-direction: column; gap: 16px; margin: 20px 0; }
+    .toggle-row { display: flex; align-items: center; justify-content: space-between; }
+    .toggle-label { font-weight: 600; font-size: 1rem; }
+    .switch { position: relative; display: inline-block; width: 52px; height: 28px; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .3s; border-radius: 34px; }
+    .slider:before { position: absolute; content: ""; height: 22px; width: 22px; right: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; }
+    input:checked + .slider { background-color: #d4af37; }
+    input:checked + .slider:before { transform: translateX(-24px); }
+    .toggle-hint { font-size: 0.8rem; color: #666; margin-top: 4px; }
+  </style>
+</head>
+<body>
+<div class="app-container">
+  <div class="top-bar">
+    <a href="index.html" class="back-link"><i class="fas fa-arrow-right"></i></a>
+    <h1>متجري</h1>
+    <div style="width:24px;"></div>
+  </div>
+
+  <div class="shop-selector">
+    <i class="fas fa-store"></i>
+    <select id="shopSelect"></select>
+  </div>
+
+  <div class="main-card" id="shopPanel" style="display: none;">
+    <div class="card-header"><i class="fas fa-pen-to-square"></i> إدارة المحل</div>
+    <div class="card-body">
+      
+      <!-- بطاقة الإحصائيات السريعة -->
+      <div class="stats-mini-grid" id="shopStatsContainer">
+        <div class="stat-mini-card">
+          <div class="stat-value" id="statTotalProducts">0</div>
+          <div class="stat-label">📦 المنتجات</div>
+        </div>
+        <div class="stat-mini-card">
+          <div class="stat-value" id="statActiveProducts">0</div>
+          <div class="stat-label">🟢 نشطة</div>
+        </div>
+        <div class="stat-mini-card">
+          <div class="stat-value" id="statInactiveProducts">0</div>
+          <div class="stat-label">🔴 غير نشطة</div>
+        </div>
+        <div class="stat-mini-card">
+          <div class="stat-value" id="statTotalOffers">0</div>
+          <div class="stat-label">🏷️ العروض</div>
+        </div>
+      </div>
+      
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="info">🏪 معلومات</button>
+        <button class="tab-btn" data-tab="products">📦 المنتجات</button>
+        <button class="tab-btn" data-tab="offers">🏷️ العروض</button>
+      </div>
+
+      <!-- تبويب المعلومات -->
+      <div id="tab-info" class="tab-pane active">
+        <div class="input-group"><label>اسم المحل</label><input id="shopName"></div>
+        <div class="input-group"><label>الطابق و رقم المحل</label><input id="shopFloor" placeholder="مثال : الأول - المحل 5"></div>
+        <div class="input-group"><label>الهاتف</label><input id="shopPhone"></div>
+        <div class="input-group">
+          <label>تصنيف المحل</label>
+          <select id="shopCategory">
+            <option value="all">الكل</option>
+            <option value="men">رجالي</option>
+            <option value="women">نسائي</option>
+            <option value="kids">ولادي</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label>صور المحل (صورتان كحد أقصى)</label>
+          <div id="shopImagesPreviewContainer" class="image-preview-row"></div>
+          <div class="upload-actions">
+            <button class="action-btn" id="uploadShopImageBtn" style="width:auto; padding:0 16px;"><i class="fas fa-folder-open"></i> من الجهاز</button>
+            <button class="action-btn" id="captureShopImageBtn" style="width:auto; padding:0 16px;"><i class="fas fa-camera"></i> الكاميرا</button>
+          </div>
+          <div class="limit-note" id="shopImageLimitMsg"></div>
+          <input type="file" id="shopImageInput" accept="image/*" style="display: none;">
+          <input type="file" id="shopCameraInput" accept="image/*" capture="environment" style="display: none;">
+        </div>
+        <button class="add-btn" id="updateShopBtn"><i class="fas fa-save"></i> حفظ المعلومات</button>
+      </div>
+
+      <!-- تبويب المنتجات -->
+      <div id="tab-products" class="tab-pane">
+        <div id="productsList"></div>
+        <button class="add-btn" id="addProductBtn"><i class="fas fa-plus"></i> إضافة منتج</button>
+      </div>
+
+      <!-- تبويب العروض -->
+      <div id="tab-offers" class="tab-pane">
+        <div id="shopOffersList"></div>
+        <button class="add-btn" id="addOfferBtn"><i class="fas fa-plus"></i> إضافة عرض</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- نافذة المنتج -->
+<div id="productModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 id="modalTitle">إضافة منتج</h3>
+      <span class="close-modal" onclick="closeModal('productModal')">&times;</span>
+    </div>
+    <div class="input-group"><label>الاسم</label><input id="prodName"></div>
+    <div class="input-group"><label>السعر</label><input id="prodPrice" type="number"></div>
+    <div class="input-group"><label>أيقونة</label><input id="prodIcon" value="fa-tshirt"></div>
+    <div class="input-group"><label>وصف</label><textarea id="prodDesc"></textarea></div>
+    <div class="input-group">
+      <label>صور المنتج</label>
+      <div class="image-upload-area" id="imageUploadArea"><i class="fas fa-cloud-upload-alt"></i><p>اضغط أو اسحب الصور هنا</p></div>
+      <input type="file" id="imageFileInput" accept="image/*" multiple style="display:none;">
+      <div class="image-preview-row" id="prodImagesPreview"></div>
+    </div>
+    <div class="input-group">
+      <label>الألوان</label>
+      <div id="colorsContainer" class="pill-container"></div>
+      <div class="color-picker-row">
+        <input type="color" id="colorPicker" value="#d4af37">
+        <input type="text" id="colorHex" placeholder="#RRGGBB" style="flex:1;" value="#d4af37">
+        <button class="action-btn" id="addColorBtn" style="width:auto; padding:0 16px;"><i class="fas fa-plus"></i></button>
+      </div>
+      <div class="quick-colors">
+        <div class="quick-color-btn" style="background:#ffffff;" data-color="#ffffff"></div>
+        <div class="quick-color-btn" style="background:#000000;" data-color="#000000"></div>
+        <div class="quick-color-btn" style="background:#e74c3c;" data-color="#e74c3c"></div>
+        <div class="quick-color-btn" style="background:#3498db;" data-color="#3498db"></div>
+        <div class="quick-color-btn" style="background:#2ecc71;" data-color="#2ecc71"></div>
+        <div class="quick-color-btn" style="background:#d4af37;" data-color="#d4af37"></div>
+      </div>
+    </div>
+    <div class="input-group">
+      <label>المقاسات</label>
+      <div id="sizesContainer" class="pill-container"></div>
+      <div style="display:flex; gap:8px;"><input type="text" id="newSize" placeholder="مقاس" style="flex:1;"><button class="action-btn" id="addSizeBtn" style="width:auto; padding:0 16px;"><i class="fas fa-plus"></i></button></div>
+      <div class="quick-sizes">
+        <button class="quick-size-btn" data-size="S">S</button><button class="quick-size-btn" data-size="M">M</button><button class="quick-size-btn" data-size="L">L</button>
+        <button class="quick-size-btn" data-size="XL">XL</button><button class="quick-size-btn" data-size="XXL">XXL</button>
+      </div>
+    </div>
+    
+    <!-- خيارات التفعيل بتصميم Toggle Switch -->
+    <div class="toggle-group">
+      <div class="toggle-row">
+        <span class="toggle-label"><i class="fas fa-eye"></i> نشط (يظهر للعملاء)</span>
+        <label class="switch">
+          <input type="checkbox" id="prodActive" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+      <div class="toggle-row">
+        <span class="toggle-label"><i class="fas fa-gift"></i> عليه عرض</span>
+        <label class="switch">
+          <input type="checkbox" id="prodHasOffer">
+          <span class="slider"></span>
+        </label>
+      </div>
+      <div class="toggle-hint">
+        <i class="fas fa-info-circle"></i> عند تفعيل "عليه عرض"، سيتم إنشاء عرض تلقائي في تبويب العروض.
+      </div>
+    </div>
+    
+    <input type="hidden" id="editProductIndex">
+    <button class="add-btn" id="saveProductBtn">حفظ</button>
+  </div>
+</div>
+
+<!-- نافذة العرض -->
+<div id="offerModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header"><h3>إضافة عرض</h3><span class="close-modal" onclick="closeModal('offerModal')">&times;</span></div>
+    <div class="input-group"><label>العنوان</label><input id="offerTitle"></div>
+    <div class="input-group"><label>الوصف</label><input id="offerDesc"></div>
+    <div class="input-group"><label>الشارة</label><input id="offerBadge" value="عرض خاص"></div>
+    <input type="hidden" id="editOfferIndex">
+    <button class="add-btn" id="saveOfferBtn">حفظ</button>
+  </div>
+</div>
+
+<div id="toast" class="toast-notification"></div>
+
+<script>
+  (async function(){
+    let shops = [], products = {}, offers = [], currentShopId = null;
+    let tempColors = [], tempSizes = [], tempImages = [], shopTempImages = [];
+    const MAX_SHOP_IMAGES = 2;
+
+    async function loadData() {
+      try {
+        // جلب المحلات
+        const shopsSnapshot = await getDocs(collection(db, 'shops'));
+        shops = shopsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+        // جلب المنتجات
+        const productsSnapshot = await getDocs(collection(db, 'products'));
+        products = {};
+        productsSnapshot.docs.forEach(doc => {
+          const data = doc.data();
+          if (!products[data.shopId]) products[data.shopId] = [];
+          products[data.shopId].push({ id: doc.id, ...data });
+        });
+
+        // جلب العروض
+        const offersSnapshot = await getDocs(collection(db, 'offers'));
+        offers = offersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+        renderShopSelect();
+      } catch (error) {
+        console.error('خطأ في تحميل البيانات:', error);
+        showToast('خطأ في تحميل البيانات');
+      }
+    }
+
+    async function saveAll() {
+      // حفظ المحلات (للتحديث فقط)
+      for (const shop of shops) {
+        await updateDoc(doc(db, 'shops', shop.id), {
+          name: shop.name, floor: shop.floor, phone: shop.phone, category: shop.category, images: shop.images || []
+        });
+      }
+
+      // حفظ المنتجات
+      for (const shopId in products) {
+        for (const product of products[shopId]) {
+          if (!product.id) {
+            const docRef = await addDoc(collection(db, 'products'), {
+              shopId: shopId, name: product.name, price: product.price, icon: product.icon, description: product.description,
+              images: product.images || [], colors: product.colors || [], sizes: product.sizes || [], active: product.active, hasOffer: product.hasOffer
+            });
+            product.id = docRef.id;
+          } else {
+            await updateDoc(doc(db, 'products', product.id), {
+              shopId: shopId, name: product.name, price: product.price, icon: product.icon, description: product.description,
+              images: product.images || [], colors: product.colors || [], sizes: product.sizes || [], active: product.active, hasOffer: product.hasOffer
+            });
+          }
+        }
+      }
+
+      // حفظ العروض
+      for (const offer of offers) {
+        if (!offer.id) {
+          const docRef = await addDoc(collection(db, 'offers'), {
+            title: offer.title, description: offer.description, badge: offer.badge, shopName: offer.shopName, type: offer.type
+          });
+          offer.id = docRef.id;
+        } else {
+          await updateDoc(doc(db, 'offers', offer.id), {
+            title: offer.title, description: offer.description, badge: offer.badge, shopName: offer.shopName, type: offer.type
+          });
+        }
+      }
+    }
+
+    // تحديث الإحصائيات السريعة
+    function updateShopStats() {
+      if (!currentShopId) return;
+      const shop = shops.find(s => s.id === currentShopId);
+      if (!shop) return;
+      
+      const prods = products[currentShopId] || [];
+      const shopOffers = offers.filter(o => o.shopName === shop.name);
+      
+      const total = prods.length;
+      const active = prods.filter(p => p.active !== false).length;
+      const inactive = total - active;
+      
+      document.getElementById('statTotalProducts').innerText = total;
+      document.getElementById('statActiveProducts').innerText = active;
+      document.getElementById('statInactiveProducts').innerText = inactive;
+      document.getElementById('statTotalOffers').innerText = shopOffers.length;
+    }
+
+    function renderShopSelect() {
+      const sel = document.getElementById('shopSelect');
+      sel.innerHTML = '<option value="">-- اختر محلك --</option>';
+      if (shops.length === 0) {
+        sel.innerHTML += '<option disabled>لا توجد محلات. أضف محلاً من لوحة المدير.</option>';
+      } else {
+        shops.forEach(s => sel.add(new Option(`${s.name} (${s.id})`, s.id)));
+      }
+      sel.onchange = () => {
+        currentShopId = sel.value;
+        document.getElementById('shopPanel').style.display = currentShopId ? 'block' : 'none';
+        if(currentShopId) {
+          loadShopData();
+          updateShopStats();
+        }
+      };
+    }
+
+    function loadShopData() {
+      const shop = shops.find(s => s.id === currentShopId);
+      document.getElementById('shopName').value = shop.name;
+      document.getElementById('shopFloor').value = shop.floor;
+      document.getElementById('shopPhone').value = shop.phone || '';
+      document.getElementById('shopCategory').value = shop.category || 'all';
+      shopTempImages = shop.images || [];
+      renderShopImagePreview();
+      renderShopOffers();
+      renderProducts();
+    }
+
+    function renderShopImagePreview() {
+      const container = document.getElementById('shopImagesPreviewContainer');
+      const limitMsg = document.getElementById('shopImageLimitMsg');
+      if (!shopTempImages.length) {
+        container.innerHTML = `<div style="width:100%; text-align:center; padding:16px; color:#888; background:#fefcf5; border-radius:28px; border:1px dashed #ccc;"><i class="fas fa-cloud-upload-alt" style="font-size:28px; opacity:0.5;"></i><p>لم يتم رفع صور بعد</p></div>`;
+      } else {
+        container.innerHTML = shopTempImages.map((img, i) => `
+          <div class="preview-img-wrapper">
+            <img src="${img}" class="preview-img">
+            <span class="remove-img" data-index="${i}">&times;</span>
+          </div>
+        `).join('');
+        document.querySelectorAll('.remove-img').forEach(btn => btn.onclick = (e) => {
+          const idx = e.target.dataset.index;
+          shopTempImages.splice(idx, 1);
+          renderShopImagePreview();
+        });
+      }
+      const remaining = MAX_SHOP_IMAGES - shopTempImages.length;
+      limitMsg.innerHTML = remaining ? `يمكنك إضافة ${remaining} ${remaining === 2 ? 'صورتين' : 'صورة'} إضافية` : '✅ تم الوصول للحد الأقصى (صورتان)';
+    }
+
+    function handleShopImageFile(file) {
+      if (shopTempImages.length >= MAX_SHOP_IMAGES) { showToast('يمكنك رفع صورتين فقط'); return; }
+      const reader = new FileReader();
+      reader.onload = e => { shopTempImages.push(e.target.result); renderShopImagePreview(); };
+      reader.readAsDataURL(file);
+    }
+
+    document.getElementById('uploadShopImageBtn').onclick = () => document.getElementById('shopImageInput').click();
+    document.getElementById('captureShopImageBtn').onclick = () => document.getElementById('shopCameraInput').click();
+    document.getElementById('shopImageInput').onchange = e => { if(e.target.files[0]) handleShopImageFile(e.target.files[0]); e.target.value = ''; };
+    document.getElementById('shopCameraInput').onchange = e => { if(e.target.files[0]) handleShopImageFile(e.target.files[0]); e.target.value = ''; };
+
+    function renderShopOffers() {
+      const shop = shops.find(s=>s.id===currentShopId);
+      const container = document.getElementById('shopOffersList');
+      const shopOffers = offers.filter(o => o.shopName === shop.name);
+      container.innerHTML = shopOffers.length ? '' : '<p>لا توجد عروض</p>';
+      shopOffers.forEach((offer) => {
+        const div = document.createElement('div'); div.className = 'list-item';
+        div.innerHTML = `<div class="item-info"><div class="item-icon"><i class="fas ${offer.icon || 'fa-gift'}"></i></div><div><h4>${offer.title}</h4><p>${offer.desc}</p></div></div>
+          <div class="item-actions"><button class="action-btn edit-offer" data-title="${offer.title}"><i class="fas fa-edit"></i></button>
+          <button class="action-btn danger-btn delete-offer" data-title="${offer.title}"><i class="fas fa-trash"></i></button></div>`;
+        container.appendChild(div);
+      });
+      document.querySelectorAll('.edit-offer').forEach(btn => btn.onclick = () => openOfferModal(btn.dataset.title));
+      document.querySelectorAll('.delete-offer').forEach(btn => btn.onclick = () => {
+        if(confirm('حذف العرض؟')) {
+          offers = offers.filter(o => !(o.shopName === shop.name && o.title === btn.dataset.title));
+          saveAll(); 
+          renderShopOffers(); 
+          updateShopStats();
+          showToast('تم الحذف');
+        }
+      });
+      updateShopStats();
+    }
+
+    function openOfferModal(title = null) {
+      const shop = shops.find(s=>s.id===currentShopId);
+      if(title) {
+        const offer = offers.find(o=>o.shopName===shop.name && o.title===title);
+        document.getElementById('offerTitle').value = offer.title;
+        document.getElementById('offerDesc').value = offer.desc;
+        document.getElementById('offerBadge').value = offer.badge || '';
+        document.getElementById('editOfferIndex').value = offers.indexOf(offer);
+      } else {
+        document.getElementById('offerTitle').value = '';
+        document.getElementById('offerDesc').value = '';
+        document.getElementById('offerBadge').value = 'عرض خاص';
+        document.getElementById('editOfferIndex').value = '';
+      }
+      document.getElementById('offerModal').style.display = 'flex';
+    }
+
+    function renderProducts() {
+      const prods = products[currentShopId] || [];
+      const container = document.getElementById('productsList');
+      container.innerHTML = prods.length ? '' : '<p>لا توجد منتجات</p>';
+      prods.forEach((p, idx) => {
+        const div = document.createElement('div'); div.className = 'list-item';
+        
+        const activeBadge = p.active !== false 
+          ? `<span class="badge badge-active" data-action="toggleActive" data-idx="${idx}"><i class="fas fa-check-circle"></i> نشط</span>`
+          : `<span class="badge badge-inactive" data-action="toggleActive" data-idx="${idx}"><i class="fas fa-times-circle"></i> معطل</span>`;
+        
+        const offerBadge = p.hasOffer 
+          ? `<span class="badge badge-offer" data-action="toggleOffer" data-idx="${idx}"><i class="fas fa-gift"></i> عليه عرض</span>`
+          : `<button class="action-btn add-offer-btn" data-action="addOffer" data-idx="${idx}" style="width:auto; padding:4px 10px; border-radius:30px; font-size:0.7rem;"><i class="fas fa-plus-circle"></i> إضافة عرض</button>`;
+        
+        div.innerHTML = `
+          <div class="item-info">
+            <div class="item-icon"><i class="fas ${p.icon}"></i></div>
+            <div class="item-details">
+              <h4>${p.name}</h4>
+              <div class="price">${p.price}$</div>
+              <div class="badge-container">
+                ${activeBadge}
+                ${offerBadge}
+              </div>
+            </div>
+          </div>
+          <div class="item-actions">
+            <button class="action-btn edit-prod" data-idx="${idx}"><i class="fas fa-edit"></i></button>
+            <button class="action-btn danger-btn delete-prod" data-idx="${idx}"><i class="fas fa-trash"></i></button>
+          </div>
+        `;
+        container.appendChild(div);
+      });
+
+      document.querySelectorAll('[data-action="toggleActive"]').forEach(el => {
+        el.onclick = (e) => {
+          e.stopPropagation();
+          const idx = el.dataset.idx;
+          const prod = products[currentShopId][idx];
+          prod.active = !prod.active;
+          saveAll();
+          renderProducts();
+          updateShopStats();
+          showToast(prod.active ? 'تم تفعيل المنتج' : 'تم تعطيل المنتج');
+        };
+      });
+
+      document.querySelectorAll('[data-action="toggleOffer"]').forEach(el => {
+        el.onclick = (e) => {
+          e.stopPropagation();
+          const idx = el.dataset.idx;
+          const prod = products[currentShopId][idx];
+          const shop = shops.find(s => s.id === currentShopId);
+          const offerTitle = `عرض خاص: ${prod.name}`;
+          
+          prod.hasOffer = false;
+          offers = offers.filter(o => !(o.shopName === shop.name && o.title === offerTitle));
+          
+          saveAll();
+          renderProducts();
+          renderShopOffers();
+          updateShopStats();
+          showToast(`تم إلغاء عرض "${prod.name}"`);
+        };
+      });
+
+      document.querySelectorAll('[data-action="addOffer"]').forEach(el => {
+        el.onclick = (e) => {
+          e.stopPropagation();
+          const idx = el.dataset.idx;
+          const prod = products[currentShopId][idx];
+          const shop = shops.find(s => s.id === currentShopId);
+          const offerTitle = `عرض خاص: ${prod.name}`;
+          
+          prod.hasOffer = true;
+          if (!offers.find(o => o.shopName === shop.name && o.title === offerTitle)) {
+            offers.push({
+              shopName: shop.name,
+              icon: 'fa-tag',
+              title: offerTitle,
+              desc: `خصم خاص على ${prod.name}`,
+              badge: 'منتج',
+              badgeIcon: 'fa-bell'
+            });
+          }
+          
+          saveAll();
+          renderProducts();
+          renderShopOffers();
+          updateShopStats();
+          showToast(`تم إضافة عرض "${prod.name}"`);
+        };
+      });
+
+      document.querySelectorAll('.edit-prod').forEach(btn => btn.onclick = () => openProductModal(btn.dataset.idx));
+      document.querySelectorAll('.delete-prod').forEach(btn => btn.onclick = () => {
+        if(confirm('حذف المنتج؟')) {
+          const prod = products[currentShopId][btn.dataset.idx];
+          if (prod.hasOffer) {
+            const shop = shops.find(s=>s.id===currentShopId);
+            offers = offers.filter(o => !(o.shopName === shop.name && o.title === `عرض خاص: ${prod.name}`));
+          }
+          products[currentShopId].splice(btn.dataset.idx,1);
+          if(!products[currentShopId].length) delete products[currentShopId];
+          saveAll(); 
+          renderProducts(); 
+          renderShopOffers(); 
+          updateShopStats();
+          showToast('تم الحذف');
+        }
+      });
+      
+      updateShopStats();
+    }
+
+    function openProductModal(idx = null) {
+      tempColors = []; tempSizes = []; tempImages = [];
+      if(idx !== null) {
+        const p = products[currentShopId][idx];
+        document.getElementById('modalTitle').innerText = 'تعديل المنتج';
+        document.getElementById('prodName').value = p.name;
+        document.getElementById('prodPrice').value = p.price;
+        document.getElementById('prodIcon').value = p.icon;
+        document.getElementById('prodDesc').value = p.longDesc || '';
+        tempImages = p.images || [];
+        tempColors = p.colors || [];
+        tempSizes = p.sizes || [];
+        document.getElementById('prodHasOffer').checked = p.hasOffer || false;
+        document.getElementById('prodActive').checked = p.active !== false;
+        document.getElementById('editProductIndex').value = idx;
+      } else {
+        document.getElementById('modalTitle').innerText = 'إضافة منتج';
+        document.getElementById('prodName').value = '';
+        document.getElementById('prodPrice').value = '';
+        document.getElementById('prodIcon').value = 'fa-tshirt';
+        document.getElementById('prodDesc').value = '';
+        document.getElementById('prodHasOffer').checked = false;
+        document.getElementById('prodActive').checked = true;
+        document.getElementById('editProductIndex').value = '';
+      }
+      renderImagePreview();
+      renderPills();
+      document.getElementById('productModal').style.display = 'flex';
+    }
+
+    function renderImagePreview() {
+      const preview = document.getElementById('prodImagesPreview');
+      preview.innerHTML = tempImages.map((img, i) => `
+        <div class="preview-img-wrapper"><img src="${img}" class="preview-img"><span class="remove-img" data-index="${i}">&times;</span></div>
+      `).join('');
+      document.querySelectorAll('.remove-img').forEach(btn => btn.onclick = (e) => {
+        tempImages.splice(e.target.dataset.index, 1);
+        renderImagePreview();
+      });
+    }
+
+    function handleFiles(files) {
+      Array.from(files).forEach(file => {
+        if(!file.type.startsWith('image/')) return;
+        const reader = new FileReader();
+        reader.onload = (e) => { tempImages.push(e.target.result); renderImagePreview(); };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    const uploadArea = document.getElementById('imageUploadArea');
+    const fileInput = document.getElementById('imageFileInput');
+    uploadArea.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', (e) => { handleFiles(e.target.files); fileInput.value = ''; });
+    uploadArea.addEventListener('dragover', (e) => { e.preventDefault(); uploadArea.classList.add('dragover'); });
+    uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('dragover'));
+    uploadArea.addEventListener('drop', (e) => { e.preventDefault(); uploadArea.classList.remove('dragover'); handleFiles(e.dataTransfer.files); });
+
+    function renderPills() {
+      const cDiv = document.getElementById('colorsContainer');
+      cDiv.innerHTML = tempColors.map(c => `<span class="pill"><span style="background:${c}; width:16px;height:16px;border-radius:50%;border:1px solid #ccc;"></span> ${c} <i class="fas fa-times" data-color="${c}" style="cursor:pointer;"></i></span>`).join('');
+      document.querySelectorAll('#colorsContainer .pill i').forEach(i => i.onclick = () => { tempColors = tempColors.filter(c => c !== i.dataset.color); renderPills(); });
+      const sDiv = document.getElementById('sizesContainer');
+      sDiv.innerHTML = tempSizes.map(s => `<span class="pill">${s} <i class="fas fa-times" data-size="${s}" style="cursor:pointer;"></i></span>`).join('');
+      document.querySelectorAll('#sizesContainer .pill i').forEach(i => i.onclick = () => { tempSizes = tempSizes.filter(s => s !== i.dataset.size); renderPills(); });
+    }
+
+    const cp = document.getElementById('colorPicker'), ch = document.getElementById('colorHex');
+    cp.addEventListener('input', () => ch.value = cp.value);
+    ch.addEventListener('input', () => { if(/^#[0-9A-F]{6}$/i.test(ch.value)) cp.value = ch.value; });
+    document.getElementById('addColorBtn').onclick = () => { const c = ch.value.trim(); if(c && !tempColors.includes(c)) { tempColors.push(c); renderPills(); } };
+    document.querySelectorAll('.quick-color-btn').forEach(b => b.onclick = () => { const c = b.dataset.color; if(!tempColors.includes(c)) { tempColors.push(c); renderPills(); } });
+    document.getElementById('addSizeBtn').onclick = () => { const s = document.getElementById('newSize').value.trim(); if(s && !tempSizes.includes(s)) { tempSizes.push(s); renderPills(); document.getElementById('newSize').value = ''; } };
+    document.querySelectorAll('.quick-size-btn').forEach(b => b.onclick = () => { const s = b.dataset.size; if(!tempSizes.includes(s)) { tempSizes.push(s); renderPills(); } });
+
+    function showToast(m) { const t = document.getElementById('toast'); t.innerText = m; t.style.display = 'block'; setTimeout(() => t.style.display = 'none', 2500); }
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+    document.getElementById('updateShopBtn').onclick = () => {
+      const shop = shops.find(s => s.id === currentShopId);
+      shop.name = document.getElementById('shopName').value;
+      shop.floor = document.getElementById('shopFloor').value;
+      shop.phone = document.getElementById('shopPhone').value;
+      shop.category = document.getElementById('shopCategory').value;
+      shop.images = shopTempImages;
+      saveAll(); showToast('تم حفظ معلومات المحل');
+    };
+
+    document.getElementById('saveProductBtn').onclick = () => {
+      const name = document.getElementById('prodName').value;
+      const price = parseFloat(document.getElementById('prodPrice').value);
+      if(!name || isNaN(price)) return showToast('الاسم والسعر مطلوبان');
+      const hasOffer = document.getElementById('prodHasOffer').checked;
+      const active = document.getElementById('prodActive').checked;
+      const prod = {
+        name, price,
+        icon: document.getElementById('prodIcon').value,
+        longDesc: document.getElementById('prodDesc').value,
+        images: tempImages,
+        colors: tempColors,
+        sizes: tempSizes,
+        hasOffer,
+        active
+      };
+      
+      const shop = shops.find(s=>s.id===currentShopId);
+      const idx = document.getElementById('editProductIndex').value;
+      const oldProd = idx ? products[currentShopId][idx] : null;
+      
+      if(!products[currentShopId]) products[currentShopId] = [];
+      if(idx) products[currentShopId][idx] = prod;
+      else products[currentShopId].push(prod);
+      
+      const offerTitle = `عرض خاص: ${name}`;
+      const existingOffer = offers.find(o => o.shopName === shop.name && o.title === offerTitle);
+      
+      if (hasOffer) {
+        if (!existingOffer) {
+          offers.push({
+            shopName: shop.name,
+            icon: 'fa-tag',
+            title: offerTitle,
+            desc: `خصم خاص على ${name}`,
+            badge: 'منتج',
+            badgeIcon: 'fa-bell'
+          });
+        }
+      } else {
+        if (existingOffer) {
+          offers = offers.filter(o => !(o.shopName === shop.name && o.title === offerTitle));
+        }
+      }
+      
+      if (oldProd && oldProd.name !== name) {
+        const oldTitle = `عرض خاص: ${oldProd.name}`;
+        offers = offers.filter(o => !(o.shopName === shop.name && o.title === oldTitle));
+        if (hasOffer) {
+          offers.push({
+            shopName: shop.name,
+            icon: 'fa-tag',
+            title: offerTitle,
+            desc: `خصم خاص على ${name}`,
+            badge: 'منتج',
+            badgeIcon: 'fa-bell'
+          });
+        }
+      }
+      
+      saveAll();
+      renderProducts();
+      renderShopOffers();
+      updateShopStats();
+      closeModal('productModal');
+      showToast('تم حفظ المنتج');
+    };
+
+    document.getElementById('addProductBtn').onclick = () => openProductModal();
+    document.getElementById('addOfferBtn').onclick = () => openOfferModal();
+    document.getElementById('saveOfferBtn').onclick = () => {
+      const shop = shops.find(s=>s.id===currentShopId);
+      const title = document.getElementById('offerTitle').value;
+      if(!title) return showToast('أدخل عنواناً');
+      const offer = { 
+        shopName: shop.name, 
+        icon: 'fa-gift', 
+        title, 
+        desc: document.getElementById('offerDesc').value, 
+        badge: document.getElementById('offerBadge').value, 
+        badgeIcon: 'fa-bell' 
+      };
+      const idx = document.getElementById('editOfferIndex').value;
+      if(idx) offers[idx] = offer; 
+      else offers.push(offer);
+      saveAll(); 
+      renderShopOffers(); 
+      updateShopStats();
+      closeModal('offerModal'); 
+      showToast('تم الحفظ');
+    };
+
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.addEventListener('click', ()=>{
+      document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+      document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById(`tab-${btn.dataset.tab}`).classList.add('active');
+    }));
+    
+    window.addEventListener('click', (e) => { 
+      if(e.target.classList.contains('modal')) e.target.style.display = 'none'; 
+    });
+
+    await loadData();
+  })();
+</script>
+</body>
+</html>
