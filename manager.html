@@ -328,40 +328,46 @@
     }
 
     async function saveAll() {
-      // حفظ الأقسام
-      for (const section of sections) {
-        await setDoc(doc(db, 'sections', section.id), { name: section.name, icon: section.icon });
-      }
+      try {
+        // حفظ الأقسام
+        for (const section of sections) {
+          await setDoc(doc(db, 'sections', section.id), { name: section.name, icon: section.icon });
+        }
 
-      // حفظ المحلات
-      for (const shop of shops) {
-        await setDoc(doc(db, 'shops', shop.id), {
-          name: shop.name, floor: shop.floor, phone: shop.phone, sectionId: shop.sectionId, category: shop.category, images: shop.images || []
-        });
-      }
-
-      // حفظ العروض
-      for (const offer of offers) {
-        await setDoc(doc(db, 'offers', offer.id || `offer_${Date.now()}`), {
-          title: offer.title, description: offer.description, badge: offer.badge, shopName: offer.shopName, type: offer.type
-        });
-      }
-
-      // حفظ المنتجات
-      for (const shopId in products) {
-        for (const product of products[shopId]) {
-          await setDoc(doc(db, 'products', product.id || `product_${Date.now()}_${Math.random()}`), {
-            shopId: shopId, name: product.name, price: product.price, icon: product.icon, description: product.description,
-            images: product.images || [], colors: product.colors || [], sizes: product.sizes || [], active: product.active, hasOffer: product.hasOffer
+        // حفظ المحلات
+        for (const shop of shops) {
+          await setDoc(doc(db, 'shops', shop.id), {
+            name: shop.name, floor: shop.floor, phone: shop.phone, sectionId: shop.sectionId, category: shop.category, images: shop.images || [], hasOffer: shop.hasOffer || false
           });
         }
-      }
 
-      // حفظ الأحداث
-      for (const event of events) {
-        await setDoc(doc(db, 'events', event.id || `event_${Date.now()}`), {
-          title: event.title, description: event.description, date: event.date, type: event.type
-        });
+        // حفظ العروض
+        for (const offer of offers) {
+          await setDoc(doc(db, 'offers', offer.id || `offer_${Date.now()}`), {
+            title: offer.title, description: offer.description, badge: offer.badge, shopName: offer.shopName, type: offer.type, icon: offer.icon, badgeIcon: offer.badgeIcon
+          });
+        }
+
+        // حفظ المنتجات
+        for (const shopId in products) {
+          for (const product of products[shopId]) {
+            await setDoc(doc(db, 'products', product.id || `product_${Date.now()}_${Math.random()}`), {
+              shopId: shopId, name: product.name, price: product.price, icon: product.icon, description: product.description,
+              images: product.images || [], colors: product.colors || [], sizes: product.sizes || [], active: product.active, hasOffer: product.hasOffer
+            });
+          }
+        }
+
+        // حفظ الأحداث
+        for (const event of events) {
+          await setDoc(doc(db, 'events', event.id || `event_${Date.now()}`), {
+            title: event.title, description: event.description, date: event.date, type: event.type
+          });
+        }
+      } catch (error) {
+        console.error('خطأ في حفظ البيانات:', error);
+        showToast('فشل حفظ البيانات في Firebase', 'error');
+        throw error;
       }
     }
 
@@ -398,7 +404,7 @@
         c.appendChild(d);
       });
       document.querySelectorAll('.edit-section').forEach(b => b.onclick = () => openSectionModal(b.dataset.idx));
-      document.querySelectorAll('.delete-section').forEach(b => b.onclick = () => {
+      document.querySelectorAll('.delete-section').forEach(b => b.onclick = async () => {
         if(confirm('حذف القسم وجميع محلاته ومنتجاتها وعروضها؟')) {
           const secId = sections[b.dataset.idx].id;
           const shopsToDelete = shops.filter(s => s.sectionId === secId);
@@ -409,7 +415,13 @@
           offers = offers.filter(o => !shopNames.includes(o.shopName));
           
           sections.splice(b.dataset.idx,1);
-          saveAll(); renderAll(); showToast('تم الحذف');
+          try {
+            await saveAll();
+            renderAll();
+            showToast('تم الحذف');
+          } catch (error) {
+            console.error(error);
+          }
         }
       });
     }
@@ -502,14 +514,20 @@
         c.appendChild(d);
       });
       document.querySelectorAll('.edit-shop').forEach(b => b.onclick = () => openShopModal(shops.findIndex(s => s.id === b.dataset.id)));
-      document.querySelectorAll('.delete-shop').forEach(b => b.onclick = () => {
+      document.querySelectorAll('.delete-shop').forEach(b => b.onclick = async () => {
         if(confirm('حذف المحل ومنتجاته وعروضه؟')) {
           const shop = shops.find(s => s.id === b.dataset.id);
           const id = b.dataset.id;
           delete products[id];
           offers = offers.filter(o => o.shopName !== shop.name);
           shops = shops.filter(s => s.id !== id);
-          saveAll(); renderAll(); showToast('تم الحذف');
+          try {
+            await saveAll();
+            renderAll();
+            showToast('تم الحذف');
+          } catch (error) {
+            console.error(error);
+          }
         }
       });
     }
@@ -579,7 +597,7 @@
     document.getElementById('shopCameraInput').addEventListener('change', e => { if(e.target.files[0]) { handleShopImageFile(e.target.files[0]); e.target.value = ''; } });
 
     // حفظ المحل (تعديل لاستخدام shopTempImages)
-    document.getElementById('saveShopBtn').onclick = () => {
+    document.getElementById('saveShopBtn').onclick = async () => {
       const id = document.getElementById('modalShopId').value.trim();
       const name = document.getElementById('modalShopName').value.trim();
       const floor = document.getElementById('modalShopFloor').value.trim();
@@ -595,7 +613,14 @@
       };
       if(editIdx !== undefined) shops[editIdx] = data;
       else { if(shops.find(s=>s.id===id)) return showToast('المعرف موجود'); shops.push(data); }
-      saveAll(); renderAll(); closeModal('shopModal'); showToast('تم الحفظ');
+      try {
+        await saveAll();
+        renderAll();
+        closeModal('shopModal');
+        showToast('تم الحفظ');
+      } catch (error) {
+        console.error(error);
+      }
     };
 
     // ========== المنتجات (بدون تغيير) ==========
@@ -617,11 +642,17 @@
       }
       if (!hasProducts) c.innerHTML = '<div class="list-item" style="justify-content:center;">لا توجد منتجات.</div>';
       document.querySelectorAll('.edit-product').forEach(b => b.onclick = () => openProductModal(b.dataset.shop, b.dataset.idx));
-      document.querySelectorAll('.delete-product').forEach(b => b.onclick = () => {
+      document.querySelectorAll('.delete-product').forEach(b => b.onclick = async () => {
         if(confirm('حذف المنتج؟')) {
           products[b.dataset.shop].splice(b.dataset.idx,1);
           if(products[b.dataset.shop].length===0) delete products[b.dataset.shop];
-          saveAll(); renderAll(); showToast('تم الحذف');
+          try {
+            await saveAll();
+            renderAll();
+            showToast('تم الحذف');
+          } catch (error) {
+            console.error(error);
+          }
         }
       });
     }
@@ -713,18 +744,32 @@
       });
       
       document.querySelectorAll('.delete-item').forEach(b => {
-        b.onclick = () => {
+        b.onclick = async () => {
           const type = b.dataset.type;
           const idx = parseInt(b.dataset.idx);
           if (type === 'offer') {
             if(confirm('حذف العرض؟')) {
               offers.splice(idx, 1);
-              saveAll(); renderOffersEvents(); updateStats(); showToast('تم الحذف');
+              try {
+                await saveAll();
+                renderOffersEvents();
+                updateStats();
+                showToast('تم الحذف');
+              } catch (error) {
+                console.error(error);
+              }
             }
           } else {
             if(confirm('حذف الفعالية؟')) {
               events.splice(idx, 1);
-              saveAll(); renderOffersEvents(); updateStats(); showToast('تم الحذف');
+              try {
+                await saveAll();
+                renderOffersEvents();
+                updateStats();
+                showToast('تم الحذف');
+              } catch (error) {
+                console.error(error);
+              }
             }
           }
         };
@@ -790,7 +835,7 @@
     function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
     // ========== مستمعات الأحداث (مع تعديلات طفيفة) ==========
-    document.getElementById('addSectionBtn').onclick = () => {
+    document.getElementById('addSectionBtn').onclick = async () => {
         const n = document.getElementById('newSectionName').value.trim();
         let i = iconSelect.value;
         if (i === 'custom') i = customInput.value.trim() || 'fa-store';
@@ -798,26 +843,40 @@
         const id = n.replace(/\s/g, '_').toLowerCase();
         if (sections.find(s => s.id === id)) return showToast('المعرف موجود');
         sections.push({ id, name: n, icon: i });
-        saveAll(); renderAll(); showToast('تمت الإضافة');
-        document.getElementById('newSectionName').value = '';
-        iconSelect.value = 'fa-tshirt';
-        customWrapper.style.display = 'none';
-        customInput.value = '';
-        updatePreview('fa-tshirt');
+        try {
+          await saveAll();
+          renderAll();
+          showToast('تمت الإضافة');
+          document.getElementById('newSectionName').value = ''; 
+          iconSelect.value = 'fa-tshirt';
+          customWrapper.style.display = 'none';
+          customInput.value = '';
+          updatePreview('fa-tshirt');
+        } catch (error) {
+          console.error(error);
+        }
     };
 
-    document.getElementById('saveSectionBtn').onclick = () => {
+    document.getElementById('saveSectionBtn').onclick = async () => {
         const idx = document.getElementById('modalSectionIndex').value;
+        if (idx === '') return showToast('خطأ في تحديد القسم');
         sections[idx].name = document.getElementById('modalSectionName').value;
         sections[idx].icon = modalIconFinal.value;
-        saveAll(); renderAll(); closeModal('sectionModal'); showToast('تم التحديث');
+        try {
+          await saveAll();
+          renderAll();
+          closeModal('sectionModal');
+          showToast('تم التحديث');
+        } catch (error) {
+          console.error(error);
+        }
     };
 
     document.getElementById('shopSectionFilter').addEventListener('change', renderShops);
     document.getElementById('showAddShopModalBtn').onclick = () => openShopModal();
 
     document.getElementById('addOfferBtn').onclick = () => openOfferModal();
-    document.getElementById('saveOfferBtn').onclick = () => {
+    document.getElementById('saveOfferBtn').onclick = async () => {
       const shop = document.getElementById('modalOfferShop').value;
       const title = document.getElementById('modalOfferTitle').value;
       if(!shop||!title) return showToast('اختر محلاً وعنواناً');
@@ -829,12 +888,20 @@
         badgeIcon: document.getElementById('modalOfferBadgeIcon').value
       };
       const idx = document.getElementById('modalOfferIndex').value;
-      if(idx) offers[idx] = offer; else offers.push(offer);
-      saveAll(); renderOffersEvents(); updateStats(); closeModal('offerModal'); showToast('تم الحفظ');
+      if(idx !== '') offers[idx] = offer; else offers.push(offer);
+      try {
+        await saveAll();
+        renderOffersEvents();
+        updateStats();
+        closeModal('offerModal');
+        showToast('تم الحفظ');
+      } catch (error) {
+        console.error(error);
+      }
     };
 
     document.getElementById('addEventBtn').onclick = () => openEventModal();
-    document.getElementById('saveEventBtn').onclick = () => {
+    document.getElementById('saveEventBtn').onclick = async () => {
       const title = document.getElementById('modalEventTitle').value;
       const date = document.getElementById('modalEventDate').value;
       if(!title || !date) return showToast('العنوان والتاريخ مطلوبان');
@@ -843,11 +910,19 @@
         desc: document.getElementById('modalEventDesc').value
       };
       const idx = document.getElementById('modalEventIndex').value;
-      if(idx) events[idx] = event; else events.push(event);
-      saveAll(); renderOffersEvents(); updateStats(); closeModal('eventModal'); showToast('تم الحفظ');
+      if(idx !== '') events[idx] = event; else events.push(event);
+      try {
+        await saveAll();
+        renderOffersEvents();
+        updateStats();
+        closeModal('eventModal');
+        showToast('تم الحفظ');
+      } catch (error) {
+        console.error(error);
+      }
     };
 
-    document.getElementById('saveProductBtn').onclick = () => {
+    document.getElementById('saveProductBtn').onclick = async () => {
       const shop = document.getElementById('modalProdShopId').value;
       const idx = document.getElementById('modalProdIndex').value;
       const prod = {
@@ -862,8 +937,15 @@
         active: document.getElementById('modalProdActive').checked
       };
       if(!products[shop]) products[shop] = [];
-      if(idx) products[shop][idx] = prod; else products[shop].push(prod);
-      saveAll(); renderAll(); closeModal('productModal'); showToast('تم الحفظ');
+      if(idx !== '') products[shop][idx] = prod; else products[shop].push(prod);
+      try {
+        await saveAll();
+        renderAll();
+        closeModal('productModal');
+        showToast('تم الحفظ');
+      } catch (error) {
+        console.error(error);
+      }
     };
 
     document.getElementById('productFilterShop').addEventListener('change', renderAllProducts);
